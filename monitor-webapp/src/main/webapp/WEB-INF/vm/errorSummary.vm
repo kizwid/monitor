@@ -1,0 +1,32 @@
+<!-- dashboard summary: list of todays actions -->
+<div id="errorAction" style="float:left;width:50%;">
+<table id="errorActionTable">
+<thead>
+<tr>
+<th align="left">ID</th>
+<th align="left">Business Date</th>
+<th align="left">Updated By</th>
+<th align="left">Action Comment</th>
+<th align="left">Count</th>
+<th align="left">Operations</th>
+</tr>
+</thead>
+
+<tbody>
+#if($errorSummaryViews.size() == 0)
+    <p>No errors to report<p>
+#{else}
+    #foreach( $errorAction in $errorSummaryViews )
+        <tr>
+            <td>$errorAction.errorActionId</td>
+            <td>$errorAction.businessDate</td>
+            <td>$errorAction.updatedBy</td>
+            <td><FONT #if($errorAction.errorActionId == -1)COLOR=RED FACE="Geneva, Arial" #{else}#end>$errorAction.actionComment</FONT></td>
+            <td><a href="errors?Action=ShowErrorActionDetails&Id=$errorAction.errorActionId&User=$User">$errorAction.numberOfItems</a></td>
+            <td>#if($errorAction.errorActionId != -1)<a href="errors?Action=DropErrorAction&Id=$errorAction.errorActionId&User=$User">drop</a>#end</td>
+        </tr>
+    #end
+#end
+</tbody>
+</table>
+</div>

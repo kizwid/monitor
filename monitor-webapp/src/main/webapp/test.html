@@ -1,0 +1,139 @@
+
+<!-- TODO: add jobMonitor tab -->
+<html>
+<head>
+    <title>Monitor Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="/monitorApp/style/style.css"/>
+    <script src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+    <!--<script type="text/javascript" src="/monitorApp/js/jobMonitor.js"></script>-->
+    <script type="text/javascript">window.onload=function(){init();}</script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="container"></div>
+
+<div id="errorMonitor">
+
+    <!-- dashboard summary: list of todays actions -->
+    <div id="summary">
+        <table>
+            <tr>
+                <th align="left">id</th>
+                <th align="left">businessDate</th>
+                <th align="left">updatedBy</th>
+                <th align="left">comment</th>
+                <th align="left">count</th>
+            </tr>
+
+            <tr>
+                <td>-1</td>
+                <td>20120210</td>
+                <td>Nobody</td>
+                <td><FONT COLOR=RED FACE="Geneva, Arial" SIZE=6>Waiting for some one to notice</FONT></td>
+                <td><a href="errors?Action=ShowErrorActionDetails&id=-1">75</a></td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>20120210</td>
+                <td>anonymous</td>
+                <td><FONT >LN_93466_FIXING20120210 of type FIXING</FONT></td>
+                <td><a href="errors?Action=ShowErrorActionDetails&id=0">140</a></td>
+            </tr>
+
+        </table>
+    </div>
+    <br>
+    <!-- filter applied to errors with no action -->
+
+
+    <form>
+        <table>
+            <tr>
+                <td align="right">
+                    Comment <input type="text" name="comment" value="">
+                </td>
+                <td align="right">
+                    User <input type="text" name="user" value="anonymous">
+                </td>
+                <td align="right">
+                    <input type="submit" name="Action" value="AddFilteredErrorsToAction"><br>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    Filter <input type="text" name="Filter" value="20120209_1857/LN_93466">
+                </td>
+                <td>
+                    FilterColumn
+                    <select name="filterColumn">
+                        <option value="errorMessage" selected="selected">errorMessage</option>
+                        <option value="runId" >runId</option>
+                        <option value="rollup" >rollup</option>
+                        <option value="riskGroup">riskGroup</option>
+                        <option value="dictionary">dictionary</option>
+                        <option value="marketData">marketData</option>
+                        <option value="split">split</option>
+                    </select>
+                </td>
+                <td align="right">
+                    <input type="submit" name="Action" value="ApplyFilter"><br>
+                </td>
+            </tr>
+            <tr>
+                <!--
+                  allow simulation of random errors for testing
+                -->
+                <td></td>
+                <td align="right">
+                    <input type="submit" name="Action" value="ListLogFiles"><br>
+                </td>
+                <td align="right">
+                    <input type="submit" name="Action" value="Simulate"><br>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <div id="errorList" class="yui3-skin-sam"></div>
+
+</div>
+
+
+<script type="text/javascript">
+    function init()
+    {
+    var initFunction = new function()
+    {
+
+    //alert('init');
+
+    //---------------------------------//
+    //
+    //      load sortable tables
+    //
+    //---------------------------------//
+    YUI().use('datatable-sort', function(Y) {
+
+    var cols = [{key:"ErrorTime",sortable:true},{key:"RunId",sortable:true},{key:"Rollup",sortable:true},{key:"RiskGroup",sortable:true},{key:"Batch",sortable:true},{key:"Dictionary",sortable:true},{key:"MarketData",sortable:true},{key:"Split",sortable:true},{key:"ErrorMessage",sortable:true}];
+    var data = [{ErrorTime:"2012-02-09 00:00:00.000",RunId:"0",Rollup:"unknown",RiskGroup:"GED_3476_CPPI_MONO",Batch:"unknown",Dictionary:"EQMKTRISK",MarketData:"INTRA",Split:"LN_93466_EUR",ErrorMessage:"Exception retrieving LN_93466_FIXING20120209 of type FIXING from NFS with key /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING20120209 : propCalcserver.riskdictionary.load.SdosLoadException: Exception calling LoadObjsFromFile for object LN_93466_FIXING20120209 of type FIXING from /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FI"},{ErrorTime:"2012-02-09 00:00:00.000",RunId:"0",Rollup:"unknown",RiskGroup:"GED_3476_CPPI_MONO",Batch:"unknown",Dictionary:"EQSPOTDELTA",MarketData:"CLOSE_INTRA",Split:"LN_93466_EUR",ErrorMessage:"Exception retrieving LN_93466_FIXING20120209 of type FIXING from NFS with key /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING20120209 : propCalcserver.riskdictionary.load.SdosLoadException: Exception calling LoadObjsFromFile for object LN_93466_FIXING20120209 of type FIXING from /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_"},{ErrorTime:"2012-02-09 00:00:00.000",RunId:"0",Rollup:"unknown",RiskGroup:"GED_3476_CPPI_MONO",Batch:"unknown",Dictionary:"EQSPOTDELTA",MarketData:"PARAM_INTRA",Split:"LN_93466_EUR",ErrorMessage:"Exception retrieving LN_93466_FIXING20120209 of type FIXING from NFS with key /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING20120209 : propCalcserver.riskdictionary.load.SdosLoadException: Exception calling LoadObjsFromFile for object LN_93466_FIXING20120209 of type FIXING from /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_"},{ErrorTime:"2012-02-09 00:00:00.000",RunId:"0",Rollup:"unknown",RiskGroup:"GED_3476_CPPI_MONO",Batch:"unknown",Dictionary:"EQSPOTDELTA",MarketData:"PROPDIV_INTRA",Split:"LN_93466_EUR",ErrorMessage:"Exception retrieving LN_93466_FIXING20120209 of type FIXING from NFS with key /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING20120209 : propCalcserver.riskdictionary.load.SdosLoadException: Exception calling LoadObjsFromFile for object LN_93466_FIXING20120209 of type FIXING from /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/L"},{ErrorTime:"2012-02-09 00:00:00.000",RunId:"0",Rollup:"unknown",RiskGroup:"GED_3476_CPPI_MONO",Batch:"unknown",Dictionary:"PRICE",MarketData:"INTRA",Split:"LN_93466_EUR",ErrorMessage:"Exception retrieving LN_93466_FIXING20120209 of type FIXING from NFS with key /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING20120209 : propCalcserver.riskdictionary.load.SdosLoadException: Exception calling LoadObjsFromFile for object LN_93466_FIXING20120209 of type FIXING from /applogs/sdos3/monitorApp_staging/mktdata/20120209_1857/LN_93466_FIXING"}];
+
+    var table = new Y.DataTable.Base({
+    columnset: cols,
+    recordset: data,
+    plugins: [ Y.Plugin.DataTableSort ]
+    });
+    table.render("#errorList");
+
+    });
+
+
+    };
+    YUI().use('event', function(Y){Y.addListener( window, "load", initFunction);});
+    }
+</script>
+
+</body>
+</html>
+
+
+

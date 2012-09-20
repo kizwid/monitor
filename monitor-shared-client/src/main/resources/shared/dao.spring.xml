@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		">
+
+    <import resource="classpath:shared/jdbc.spring.xml" />
+
+    <bean id="pricingErrorDao" class="kizwid.shared.dao.PricingErrorDaoImpl">
+    <constructor-arg ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="errorEventDao" class="kizwid.shared.dao.ErrorEventDaoImpl">
+        <constructor-arg ref="jdbcTemplate"/>
+        <constructor-arg ref="pricingErrorDao"/>
+    </bean>
+    <bean id="errorActionDao" class="kizwid.shared.dao.ErrorActionDaoImpl">
+        <constructor-arg ref="jdbcTemplate"/>
+        <constructor-arg ref="pricingErrorDao"/>
+    </bean>
+
+    <bean id="databaseReleaseDao" class="kizwid.shared.dao.DatabaseReleaseDao">
+        <constructor-arg ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="pricingRunDao" class="kizwid.shared.dao.PricingRunDaoImpl">
+        <constructor-arg ref="jdbcTemplate"/>
+    </bean>
+</beans>

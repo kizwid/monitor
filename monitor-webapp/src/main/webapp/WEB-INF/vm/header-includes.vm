@@ -1,0 +1,27 @@
+
+    <!-- local copy of css -->
+    <link rel="stylesheet" type="text/css" href="../style/yui2/tabview.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/yui2/datatable.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/yui2/menu.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/yui2/fonts-min.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/yui2/paginator.css"/>
+
+    <!-- local copy of js -->
+    <script type="text/javascript" src="../js/yui2/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../js/yui2/element-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/connection-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/datasource-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/get-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/json-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/swf-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/animation-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/charts-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/datatable-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/tabview-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/container_core-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/menu-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/event-delegate-min.js"></script>
+    <script type="text/javascript" src="../js/yui2/paginator-min.js"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="../style/style.css"/>-->
+    <script type="text/javascript">window.onload=function(){initDashBoard();}</script>

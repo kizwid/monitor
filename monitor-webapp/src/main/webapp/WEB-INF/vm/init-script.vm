@@ -1,0 +1,71 @@
+<script type="text/javascript">
+    function init()
+    {
+        var initFunction = new function()
+        {
+
+            //alert('init');
+
+            //---------------------------------//
+            //
+            //      load sortable tables
+            //
+            //---------------------------------//
+            YUI().use('datatable-sort','node','tabview','event', function(Y) {
+
+                var cols = $errorEventColumnJson;
+                var data = $errorEventDataJson;
+
+                var table = new Y.DataTable.Base({
+                columnset: cols,
+                recordset: data,
+                plugins: [ Y.Plugin.DataTableSort ]
+                });
+                table.render("#errorList");
+
+                table.on("click", function(){alert('table clicked');});
+
+                //---------------------------------//
+                //
+                //      add tabs
+                //
+                //---------------------------------//
+                //var tabView = new Y.TabView({
+                //    children: [{
+                //        label: 'Error Monitor',
+                //        panelNode: document.getElementById('errorMonitor')
+                //    }, {
+                //        label: 'Job Monitor',
+                //        content: '<p>comming soon</p>'
+                //    }]
+                //});
+
+                //tabView.render('#container');
+
+                //TODO: need to forward the click event from the tab to the table
+                //tabView.on("click", table.simulate("click"));
+
+
+                <!--
+                //---------------------------------//
+                //
+                //      add jobMonitor
+                //
+                //---------------------------------//
+                {
+                //var jobMonitor = new JobMonitor( this);
+                //var tab = new Y.Tab({
+                //    label: 'Job Monitor',
+                //    panelNode: jobMonitor.eMain
+                //    });
+                //tabView.addChild( tab);
+                }
+                -->
+
+            });
+
+
+        };
+        //YUI().use('event', function(Y){Y.addListener( window, "load", initFunction);});
+    }
+</script>

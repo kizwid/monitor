@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Error Action Details</title>
+    #parse("header-includes.vm")
+</head>
+<body class="yui-skin-sam">
+
+    <div id="container"></div>
+
+    <div id="errorMonitor">
+
+        <div>
+            #parse("errorSummary.vm" )
+            <form style="clear:both;">
+        <br>
+                <input type="hidden" name="User" value="$User">
+                <input type="submit" name="Action" value="Dashboard">
+        </form>
+        </div>
+
+        <div id="container-for-paginator" style="clear:both;">
+            #if( ! $TooManyErrors)
+            #{else}
+            <font COLOR=RED FACE="Geneva, Arial">$TooManyErrors</font>
+            #end
+            <div id="errorList"></div>
+    </div>
+        <div id="version">version: $Version environment: $Env</div>
+
+        <div id="container-for-paginator" style="clear:both;">
+            #if( ! $TooManyErrors)
+            #{else}
+            <font COLOR=RED FACE="Geneva, Arial">$TooManyErrors</font>
+            #end
+            <div id="errorList"></div>
+    </div>
+        <div id="version">version: $Version environment: $Env</div>
+
+    </div>
+
+#parse("script-init.vm")
+
+</body>
+</html>

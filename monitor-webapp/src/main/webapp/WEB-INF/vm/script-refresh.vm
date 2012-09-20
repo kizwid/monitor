@@ -1,0 +1,73 @@
+<script type="text/javascript">
+
+
+var AjaxObject = {
+
+	handleSuccess:function(o) {
+        //compare with cached value
+        var cached = document.getElementById('cached');
+        var latest = document.getElementById('latestId');
+
+        //trim value before using it
+        latest.innerHTML=o.responseText.replace(/^\s+|\s+$/g, '');
+
+        if( latest.innerHTML == cached.innerHTML){
+            this.unstale();
+        }else{
+            this.stale();
+        };
+        this.unbusy();
+        document.getElementById('busy').innerHTML="checking for update...";
+        this.startRequest();
+	},
+
+	stale:function() {
+	   document.getElementById('refresh').style.display = "block";
+	   document.getElementById('refreshButton').style.background = "red";
+	},
+
+	unstale:function() {
+	   document.getElementById('refresh').style.display = "none";
+	},
+
+	busy:function() {
+	   document.getElementById('busy').innerHTML="checking for updates";
+	   //document.getElementById('busy').style.display = "block";
+	},
+
+	unbusy:function() {
+	   document.getElementById('busy').style.display = "none";
+	},
+
+	handleFailure:function(o) {
+	    this.unstale();
+	    document.getElementById('busy').innerHTML="can't connect to server!";
+        document.getElementById('busy').style.display = "block";
+		YAHOO.lang.later( 10000, this, this.makeRequest, [], false);
+	},
+
+	startRequest:function() {
+	   YAHOO.lang.later( 10000, this, this.makeRequest, [], false);
+	},
+
+	makeRequest:function() {
+	   this.busy();
+	   YAHOO.util.Connect.asyncRequest('POST', 'data?Action=LatestId', callback, "new=1&old=2");
+	}
+
+};
+
+/*
+ * Define the callback object for success and failure
+ * handlers as well as object scope.
+ */
+var callback = {
+	success:AjaxObject.handleSuccess,
+	failure:AjaxObject.handleFailure,
+	scope: AjaxObject
+};
+
+// Start the transaction.
+//AjaxObject.startRequest();
+
+</script>

@@ -1,0 +1,242 @@
+<script type="text/javascript">
+    function initDashBoard()
+    {
+        var initFunction = new function()
+        {
+
+            //alert('init');
+
+            //---------------------------------//
+            //
+            //      add errorAction to dataTable
+            //
+            //---------------------------------//
+            var errorActionDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("errorActionTable"));
+            errorActionDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+            errorActionDataSource.responseSchema = {
+                fields: [
+                    { key: "ID", parser:"number" },
+                    { key: "Business Date" },
+                    { key: "Updated By" },
+                    { key: "Action Comment" },
+                    { key: "Count" },
+                    { key: "Operations" }
+                ]
+            };
+            var errorActionTableCols = [
+                { key: "ID", sortable:true },
+                { key: "Business Date", sortable:true },
+                { key: "Updated By", sortable:true },
+                { key: "Action Comment", sortable:true, resizeable:true },
+                { key: "Count", sortable:true },
+                { key: "Operations" }
+            ];
+
+            var errorActionTable = new YAHOO.widget.DataTable("errorAction",
+               errorActionTableCols, errorActionDataSource, {scrollable:true,width:"45em",height:"10em"});
+
+            //---------------------------------//
+            //
+            //      load error detail data into tables
+            //
+            //---------------------------------//
+            var cols = $errorEventColumnJson;
+            var data = $errorEventDataJson;
+
+            var myDataSource = new YAHOO.util.DataSource(data);
+            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            myDataSource.responseSchema = {
+            fields: ["ErrorTime","ErrorMessage","RunId","Rollup","RiskGroup","Batch","Dictionary", "MarketData","Split","RunLabel","LaunchEventId","ConfigId","BusinessDate"]
+            };
+
+            //add paginator if we breach performance threshhold
+            //TODO: re-enable (had to disabled as page widget is being shown in wrong part of screen)
+            var oConfigs;
+            if( $errorDetailViews.size() > 300 ){
+                oConfigs = {
+                        paginator: new YAHOO.widget.Paginator({
+                            rowsPerPage: 300
+                        }),
+                        initialRequest: "results=${errorDetailViews.size()}",
+                        scrollable:true,width:"100%",height:"40em"
+                };
+            }else{
+                oConfigs = {scrollable:true,width:"100%",height:"40em"};
+            };
+            var table =
+            new YAHOO.widget.DataTable("errorList", cols, myDataSource, oConfigs);
+
+            //---------------------------------//
+            //
+            //      add context menu to table
+            //
+            //---------------------------------//
+            var onContextMenuClick = function(p_sType, p_aArgs, p_myDataTable) {
+                var task = p_aArgs[1];
+                var taskUrlRoot = "data?Action=ShowFile&File=";
+
+                if(task) {
+                    // Extract which TR element triggered the context menu
+                    var elRow = this.contextEventTarget;
+                    elRow = p_myDataTable.getTrEl(elRow);
+
+                    if(elRow) {
+                        switch(task.index) {
+                            case 0:     // show sdos file
+                            var oRecord = p_myDataTable.getRecord(elRow);
+                            var filePath = "${SambaStaging}/sdos/" +
+                            oRecord.getData("RunLabel") + "/" +
+                            oRecord.getData("RiskGroup") + "." +
+                            oRecord.getData("BusinessDate") +
+                            ".sdos";
+                            popupPage(taskUrlRoot, filePath);
+                            break;
+
+                            case 1:     // show sdos split file
+                            var oRecord = p_myDataTable.getRecord(elRow);
+                            var filePath = "${SambaStaging}/sdos/" +
+                            oRecord.getData("RunLabel") + "/" +
+                            oRecord.getData("RiskGroup") + "." +
+                            oRecord.getData("Split") + "." +
+                            oRecord.getData("BusinessDate") +
+                            ".sdos";
+                            popupPage(taskUrlRoot, filePath);
+                            break;
+
+                            case 2:     // show pricing log file
+                            var oRecord = p_myDataTable.getRecord(elRow);
+                            var filePath = "${SambaPricingLogBase}/" +
+                                oRecord.getData("RiskGroup") + "/" +
+                                oRecord.getData("RiskGroup");
+                            var batch = oRecord.getData("Batch");
+                            if( batch == "TESTBOOK"){
+                                filePath = filePath + "." +
+                                oRecord.getData("Dictionary") + "." +
+                                oRecord.getData("MarketData") + ".1." +
+                                oRecord.getData("BusinessDate") +
+                                ".TESTBOOK.log";
+                            }else{
+                                filePath = filePath + "." +
+                                oRecord.getData("Split") + "." +
+                                oRecord.getData("Dictionary") + "." +
+                                oRecord.getData("MarketData") + ".1." +
+                                oRecord.getData("BusinessDate") +
+                                ".RISKRUN.log";
+                            };
+                            popupPage(taskUrlRoot, filePath);
+
+                            break;
+                        }
+                    }
+                }
+            };
+
+            var aItems = [
+                {
+                    text:"show sdos file" //,submenu:{ id:"tradeMenu",itemdata:[{text:"show sdos file"}]}
+                },
+                {
+                    text:"show sdos split file"
+                },
+                {
+                    text:"show pricing log file"
+                }
+            ];
+
+            var myContextMenu = new YAHOO.widget.ContextMenu("mycontextmenu",{trigger:table.getTbodyEl()});
+            myContextMenu.addItems(aItems);
+            // Render the ContextMenu instance to the parent container of the DataTable
+            myContextMenu.render("errorList");
+            myContextMenu.clickEvent.subscribe(onContextMenuClick, table);
+
+
+            //---------------------------------//
+            //
+            //      add tabs
+            //
+            //---------------------------------//
+            var tabView = new YAHOO.widget.TabView();
+
+            //---------------------------------//
+            //
+            //           add errorMonitor tab
+            //
+            //---------------------------------//
+            {
+            var tab = new YAHOO.widget.Tab({
+            label: 'Error Monitor',
+            contentEl: document.getElementById('errorMonitor'),
+            active: true
+            });
+            tabView.addTab( tab);
+            }
+
+            //---------------------------------//
+            //
+            //           add jobMonitor tab
+            //
+            //---------------------------------//
+
+            tabView.appendTo('container');
+
+            //forward the click event from the tab to the table
+            tabView.getTab(0).addListener("click", function() {table.onShow()});
+
+            //start long-poll
+            #if( $Id == -1)
+                AjaxObject.unbusy();
+                AjaxObject.unstale();
+                AjaxObject.startRequest();
+            #end
+
+            return {
+                oDS: myDataSource,
+                oDT: table,
+                oTV: tabView
+            };
+
+
+        };
+    }
+
+function popupMessage(message, title) {
+	var w=window.open('','name','height=200,width=800');
+	var tmp = w.document;
+	tmp.write('<html><head><title>' + title + '</title>');
+	tmp.write('</head><body><p>' + title + '</p>');
+	tmp.write('<p>' + message + '</p>');
+	tmp.write('</body></html>');
+	tmp.close();
+}
+
+function popupPage(htmlRoot, page) {
+
+    //we have a problem on some PCs running MSIE 7
+    //hence
+    if( navigator.appVersion.indexOf("MSIE 7") > 0){
+
+        copyToClipboard( page);
+
+    }else{
+
+        window.open( htmlRoot + page,
+            "_blank",
+            "height=200,width=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes");
+
+    };
+
+}
+
+function copyToClipboard(s){
+    var message;
+    if( window.clipboardData && clipboardData.setData )
+    {
+        clipboardData.setData("Text", s);
+        message = 'copied to clipboard:\n' + s;
+    } else{
+        message = 'copy to clipboard not allowed:\n' + s;
+    };
+    alert( message);
+}
+
+</script>

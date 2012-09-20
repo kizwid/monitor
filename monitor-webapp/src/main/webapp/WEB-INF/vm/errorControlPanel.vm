@@ -1,0 +1,90 @@
+<!-- filter applied to errors with no action -->
+
+<div id="errorControlPanel" style="float:right;height:12em;width:450px;border:1px solid #cbcbcb;">
+
+#if( ! $validationError)
+#{else}
+    <font COLOR=RED FACE="Geneva, Arial">$validationError</font>
+#end
+
+<form>
+<input type="hidden" name="User" value="$User">
+<table style="float:right;">
+<tr>
+    <td colspan="2">
+<table>
+<tr>
+                <td width="15%">Comment</td>
+                <td width="85%"><input type="text" name="Comment" value="$Comment" size="100" maxlength="255" style="width:100%;"></td>
+            </tr>
+        </table>
+</td>
+</tr>
+<tr>
+  <td>Filtered item count: $errorDetailViews.size()</td>
+<td align="right">
+    <input type="submit" name="Action" value="Add filtered errors to action"><br>
+</td>
+</tr>
+<tr>
+<td align="right">
+  Filter <input type="text" name="Filter" value="$Filter">
+</td>
+  <td align="right">
+    Column
+    <select name="FilterColumn">
+    #set($filterColumns=["error_message","run_id","rollup","risk_group","batch","dictionary","market_data","split","run_label","launch_event_id","config_id","run_business_date"])
+    #foreach( $column in $filterColumns )
+        <option value="$column"
+            #if( $column == $FilterColumn)
+                selected="selected"
+            #end
+            >$column</option>
+    #end
+  </select>
+</td>
+</tr>
+<tr>
+    <td colspan="3">
+        <table width="100%">
+            <tr>
+                <td width="15%">
+                    <input id="refreshButton" type="submit" name="Action" value="Refresh">
+</td>
+                <td width="40%">
+                    <div id="refresh">please refresh</div>
+                </td>
+                <td width="45%" align="right">
+                    #if( $Filter.length() == 0)
+                    #{else}
+                    <input type="submit" name="Action" value="Remove filter">
+                    #end
+                    <input type="submit" name="Action" value="Apply filter"><br>
+                </td>
+</tr>
+
+<tr>
+                <td>
+</td>
+                <td>
+                    <div id="busy"></div>
+                </td>
+<td align="right">
+                    #if( $Env == "dev")
+                    <input type="submit" name="Action" value="List log files"><br>
+                    #end
+</td>
+</tr>
+
+</table>
+        <div id="info" class="yui-hidden">
+            <div id="cached" style="float:left;">$latestId</div> vs
+            <div id="latestId" style="float:right;"></div>
+        </div>
+    </td>
+</tr>
+
+</table>
+</form>
+
+</div>

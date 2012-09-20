@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Error Loader</title>
+<link rel="stylesheet" type="text/css" href="../style/style.css"/>
+
+</head>
+<body>
+
+Files available in directory $Dir
+<table>
+<tr>
+<th>filename</th>
+</tr>
+#foreach( $file in $Files )
+    <tr>
+        <td>$file <a href="errors?Action=LoadFromLog&File=$file&User=$User">load</a></td>
+    </tr>
+#end
+</table>
+
+</body>
+</html>
