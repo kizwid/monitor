@@ -10,7 +10,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import java.util.List;
 
 public class ErrorEventDaoHibernate
-        //extends BaseDaoHibernateImpl implements BaseDao
+        //extends BaseDaoHibernateImpl implements GenericDao
 {
 
     private final HibernateTemplate hibernateTemplate;

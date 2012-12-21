@@ -14,7 +14,7 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class ErrorDetailViewDaoImpl extends AbstractBaseDao implements ErrorDetailViewDao {
+public class ErrorDetailViewDaoImpl extends AbstractGenericDao implements ErrorDetailViewDao {
     private final static Logger logger = LoggerFactory.getLogger(ErrorDetailViewDaoImpl.class);
 
     public ErrorDetailViewDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -24,7 +24,7 @@ public class ErrorDetailViewDaoImpl extends AbstractBaseDao implements ErrorDeta
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public void save(Object entity) {

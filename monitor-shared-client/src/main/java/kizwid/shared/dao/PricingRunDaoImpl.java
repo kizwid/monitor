@@ -16,7 +16,7 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class PricingRunDaoImpl extends AbstractBaseDao implements PricingRunDao {
+public class PricingRunDaoImpl extends AbstractGenericDao implements PricingRunDao {
     private final static Logger logger = LoggerFactory.getLogger(PricingRunDaoImpl.class);
 
     public PricingRunDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -26,7 +26,7 @@ public class PricingRunDaoImpl extends AbstractBaseDao implements PricingRunDao 
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public void save(Object entity) {

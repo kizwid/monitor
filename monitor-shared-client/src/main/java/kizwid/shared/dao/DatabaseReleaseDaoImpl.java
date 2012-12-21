@@ -18,7 +18,7 @@ import java.util.List;
  * User: kizwid
  * Date: 2012-01-31
  */
-public class DatabaseReleaseDaoImpl extends AbstractBaseDao implements DatabaseReleaseDao{
+public class DatabaseReleaseDaoImpl extends AbstractGenericDao implements DatabaseReleaseDao{
     private final Logger logger = LoggerFactory.getLogger(DatabaseReleaseDaoImpl.class);
 
     public DatabaseReleaseDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -28,7 +28,7 @@ public class DatabaseReleaseDaoImpl extends AbstractBaseDao implements DatabaseR
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public void delete(Object entity, SimpleCriteria criteria) {throw new UnsupportedOperationException();}

@@ -16,11 +16,11 @@ import java.util.List;
  * User: kizwid
  * Date: 2012-02-16
  */
-public abstract class AbstractBaseDao implements BaseDao{
+public abstract class AbstractGenericDao implements GenericDao {
 
-    private final static Logger logger = LoggerFactory.getLogger(AbstractBaseDao.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractGenericDao.class);
     static {
-        logger.info("loaded AbstractBaseDao version 20120309-1554");
+        logger.info("loaded AbstractGenericDao version 20120309-1554");
     }
     protected final JdbcTemplate jdbcTemplate;
     private final String sqlSelectAll;
@@ -29,11 +29,11 @@ public abstract class AbstractBaseDao implements BaseDao{
     private final String databaseDialect;
 
 
-    public AbstractBaseDao(JdbcTemplate jdbcTemplate, String sqlSelectAll, String primaryKeyField) {
+    public AbstractGenericDao(JdbcTemplate jdbcTemplate, String sqlSelectAll, String primaryKeyField) {
         this(jdbcTemplate,sqlSelectAll, primaryKeyField, "", "");
     }
-    public AbstractBaseDao(JdbcTemplate jdbcTemplate, String sqlSelectAll, String primaryKeyField,
-                           String sqlGroupBy, String sqlOrderBy) {
+    public AbstractGenericDao(JdbcTemplate jdbcTemplate, String sqlSelectAll, String primaryKeyField,
+                              String sqlGroupBy, String sqlOrderBy) {
         this.jdbcTemplate = jdbcTemplate;
         this.databaseDialect = readDatabaseDialect(jdbcTemplate);
         this.sqlGroupBy = sqlGroupBy;

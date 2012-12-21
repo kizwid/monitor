@@ -15,7 +15,7 @@ import java.util.List;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class PricingErrorDaoImpl extends AbstractBaseDao implements PricingErrorDao {
+public class PricingErrorDaoImpl extends AbstractGenericDao implements PricingErrorDao {
     private final static Logger logger = LoggerFactory.getLogger(PricingErrorDaoImpl.class);
 
     public PricingErrorDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -25,7 +25,7 @@ public class PricingErrorDaoImpl extends AbstractBaseDao implements PricingError
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public void save(Object entity) {

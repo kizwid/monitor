@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class BaseDaoHibernateImpl {
+public class  BaseDaoHibernateImpl {
     private static final Logger logger = LoggerFactory.getLogger(BaseDaoHibernateImpl.class);
 
     protected HibernateTemplate hibernateTemplate;

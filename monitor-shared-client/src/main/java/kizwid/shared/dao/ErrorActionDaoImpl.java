@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class ErrorActionDaoImpl extends AbstractBaseDao implements ErrorActionDao {
+public class ErrorActionDaoImpl extends AbstractGenericDao implements ErrorActionDao {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorActionDaoImpl.class);
     public static final SimpleDateFormat YYYYMMDD = new SimpleDateFormat("yyyyMMdd");
@@ -32,7 +32,7 @@ public class ErrorActionDaoImpl extends AbstractBaseDao implements ErrorActionDa
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public <T> T readById(Class<T> clazz, long id) {

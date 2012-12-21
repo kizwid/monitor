@@ -40,7 +40,7 @@
 
     <aop:config>
         <aop:pointcut id="daoTransactionOperation"
-                      expression="execution(* kizwid.shared.dao.BaseDao.*(..))" />
+                      expression="execution(* kizwid.shared.dao.GenericDao.*(..))" />
         <aop:advisor advice-ref="txAdvice" pointcut-ref="daoTransactionOperation" />
     </aop:config>
 

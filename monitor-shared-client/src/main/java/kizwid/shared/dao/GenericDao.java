@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @author kizwid
  */
-public interface BaseDao {
+public interface GenericDao {  //<T>
 
     /**
      * Removes <code>deleteableObject</code>s from the database.

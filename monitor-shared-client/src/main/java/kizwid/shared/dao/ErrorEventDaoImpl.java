@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class ErrorEventDaoImpl extends AbstractBaseDao implements BaseDao, ErrorEventDao {
+public class ErrorEventDaoImpl extends AbstractGenericDao implements GenericDao, ErrorEventDao {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorEventDaoImpl.class);
     private final PricingErrorDao pricingErrorDao;
@@ -28,7 +28,7 @@ public class ErrorEventDaoImpl extends AbstractBaseDao implements BaseDao, Error
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public <T> T readById(Class<T> clazz, long id) {

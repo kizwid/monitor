@@ -14,7 +14,7 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class ErrorSummaryViewDaoImpl extends AbstractBaseDao implements ErrorSummaryViewDao {
+public class ErrorSummaryViewDaoImpl extends AbstractGenericDao implements ErrorSummaryViewDao {
     private final static Logger logger = LoggerFactory.getLogger(ErrorSummaryViewDaoImpl.class);
     public static final String SQL_FIELD_LIST = "error_action_id,business_date,updated_by,updated_at,action_comment";
 
@@ -27,7 +27,7 @@ public class ErrorSummaryViewDaoImpl extends AbstractBaseDao implements ErrorSum
     }
 
     //------------------------------------------------------
-    // BaseDao implementation
+    // GenericDao implementation
     //------------------------------------------------------
     @Override
     public void save(Object entity) {

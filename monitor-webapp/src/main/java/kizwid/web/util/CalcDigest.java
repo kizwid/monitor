@@ -18,7 +18,7 @@ public class CalcDigest {
         md.update(text.getBytes());
 
         byte bytes[] = md.digest();
-        StringBuffer sb = new StringBuffer(bytes.length * 2);
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
 
         sb.append(text.length());
         sb.append(' ');

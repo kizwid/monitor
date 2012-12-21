@@ -84,9 +84,6 @@ public class WebServer implements Runnable{
                 SecurityHandler sh = new SecurityHandler();
                 final HashUserRealm userRealm = new HashUserRealm("default", webAppPath + "/WEB-INF/realm.properties");
                 sh.setUserRealm(userRealm); //tomcat:tomcat,tomcat
-//                userRealm.put("t", "t");
-//                userRealm.addUserToRole("t", "tester");
-//                userRealm.addUserToRole("t", "gmrsk_SUPPORT");
                 sh.setUserRealm(userRealm);
                 sh.setConstraintMappings(new ConstraintMapping[]{cm});
                 webAppContext.setSecurityHandler(sh);

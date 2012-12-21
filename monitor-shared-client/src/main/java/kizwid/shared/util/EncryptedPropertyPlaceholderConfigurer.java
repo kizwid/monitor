@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jndi.JndiTemplate;
 
 import javax.naming.NamingException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -25,6 +26,16 @@ public class EncryptedPropertyPlaceholderConfigurer extends PropertyPlaceholderC
     //for Jndi based properties
     private String jndiPrefix = "java:comp/env/";
     private JndiTemplate jndiTemplate = new JndiTemplate();
+    private Cryptography crypt;
+
+    public EncryptedPropertyPlaceholderConfigurer(){
+        super();
+        try {
+            this.crypt = new Cryptography("secret");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
 
     @Override
     protected  String convertPropertyValue(String originalValue){
@@ -39,9 +50,9 @@ public class EncryptedPropertyPlaceholderConfigurer extends PropertyPlaceholderC
 
                 final String decrypted;
                 if(ENCRYPT_KEY.length()> 0){
-                    decrypted = Cryptography.decrypt(encrypted,ENCRYPT_KEY);
+                    decrypted = crypt.decrypt(encrypted,ENCRYPT_KEY);
                 }else{
-                    decrypted = Cryptography.decrypt(encrypted);//TODO nice to delegate management of crypography to 3rd party, but reading file each time - is this best way?
+                    decrypted = crypt.decrypt(encrypted, "TODO:add salt");//TODO nice to delegate management of crypography to 3rd party, but reading file each time - is this best way?
                 }
                 return decrypted;
             } catch (Exception e) {
