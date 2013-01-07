@@ -1,1 +1,7 @@
 non-trivial example of spring/hibernate/jetty webapp for viewing data in database
+
+
+------------------------------------------------
+-- dependency
+------------------------------------------------
+shared-util <- shared-database

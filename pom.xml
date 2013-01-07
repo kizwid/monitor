@@ -7,16 +7,19 @@
 
     <groupId>kizwid</groupId>
     <version>1.0-SNAPSHOT</version>
-    <artifactId>monitor</artifactId>
+    <artifactId>kizwid</artifactId>
     <packaging>pom</packaging>
     <name>${artifactId}</name>
 
     <description>Example Monitor Application Project</description>
 
     <modules>
-        <module>monitor-shared-client</module>
-        <module>monitor-webapp</module>
-        <module>shared-web-container</module>
+        <module>kizwid-shared-util</module>
+        <module>kizwid-shared-client</module>
+        <module>kizwid-webapp</module>
+        <module>kizwid-web-container</module>
+        <module>kizwid-shared-dao</module>
+        <module>kizwid-shared-database</module>
     </modules>
 
     <build>

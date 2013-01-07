@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		">
+
+    <import resource="classpath:sqlLoader/jdbc.spring.xml" />
+
+    <bean id="databaseReleaseDao" class="kizwid.sqlLoader.dao.DatabaseReleaseDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="sqlLoader" class="kizwid.sqlLoader.SqlLoader">
+        <constructor-arg ref="databaseReleaseDao"/>
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg value="sqlLoader/sql/${jdbc.dialect}"/>
+    </bean>
+
+</beans>

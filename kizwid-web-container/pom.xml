@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>kizwid</artifactId>
+        <groupId>kizwid</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>kizwid-web-container</artifactId>
+    <name>${artifactId}</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <jetty.version>8.0.0.M3</jetty.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+
+<!--
+                <configuration>
+                    &lt;!&ndash;<jettyConfig>src/test/resources/jetty.xml</jettyConfig>&ndash;&gt;
+                    <stopKey>1</stopKey>
+                    <stopPort>999</stopPort>
+                    <webAppConfig>
+                        <contextPath>/</contextPath>
+                    </webAppConfig>
+                    <connectors>
+                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                            <port>8080</port>
+                        </connector>
+&lt;!&ndash;
+                        <connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
+                            <port>8443</port>
+                            <keystore>src/test/resources/keystore</keystore>
+                            <keyPassword>OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</keyPassword>
+                            <password>OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</password>
+
+                            &lt;!&ndash;
+                                               <keystore>src/test/resources/server.keystore</keystore>
+                                               <keyStorePassword>password</keyStorePassword>
+                                               <keyManagerPassword>password</keyManagerPassword>
+                                               <trustStore>src/test/resources/server.keystore</trustStore>
+                                               <trustStorePassword>password</trustStorePassword>
+                                       <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
+                                <Set name="keyStore"><SystemProperty name="jetty.home" default="." />/etc/keystore</Set>
+                                <Set name="keyStorePassword">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
+                                <Set name="keyManagerPassword">OBF:1u2u1wml1z7s1z7a1wnl1u2g</Set>
+                                <Set name="trustStore"><SystemProperty name="jetty.home" default="." />/etc/keystore</Set>
+                                <Set name="trustStorePassword">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
+                              </New>
+                            &ndash;&gt;
+                        </connector>
+&ndash;&gt;
+                    </connectors>
+                </configuration>
+-->
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+    </dependencies>
+
+</project>
