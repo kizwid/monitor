@@ -84,7 +84,7 @@ public class ErrorControllerTest {
 
         // full database export
         IDataSet fullDataSet = connection.createDataSet();
-        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("full-dataset.xml"));
+        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("target/full-dataset.xml"));
 
 
     }

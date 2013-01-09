@@ -102,7 +102,7 @@ public class AbstractDatabaseTest {
         IDatabaseConnection connection = new DatabaseConnection(conn);
         // full database export
         IDataSet fullDataSet = connection.createDataSet();
-        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("full-dataset-dbmaintain.xml"));
+        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("target/full-dataset-dbmaintain.xml"));
     }
 
 }
