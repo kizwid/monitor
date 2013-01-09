@@ -20,7 +20,8 @@ public class TableAndSchemaExtractor {
      * followed by a table name of the form 'foo' or 'schema.foo',
      * followed by any number of remaining characters.
      */
-    private static final Pattern TABLE_MATCH_PATTERN = Pattern.compile(".*\\s+from\\s+(\\w+(\\.\\w+)?).*", //.*s+froms+(w+(.w+)?).*
+    private static final Pattern TABLE_MATCH_PATTERN =
+            Pattern.compile(".*\\s+from\\s+(\\w+(\\.\\w+)?).*",
             Pattern.CASE_INSENSITIVE);
 
 

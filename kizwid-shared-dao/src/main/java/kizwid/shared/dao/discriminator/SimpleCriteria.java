@@ -24,7 +24,11 @@ public class SimpleCriteria {
     public void addCriterion(SimpleCriterion criterion){
         criteria.add(criterion);
     }
-    
+
+    public List<SimpleCriterion> getCriteria() {
+        return criteria;
+    }
+
     public String resolveWhereClause(){
         List<Object> values = new LinkedList<Object>();
         StringBuilder sb = new StringBuilder();

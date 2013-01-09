@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.util.*;
 
@@ -20,9 +18,9 @@ import java.util.*;
  * Time: 23:32
  * To change this template use File | Settings | File Templates.
  */
-public abstract class GenericDaoSpringJdbcImpl<T> implements GenericDao<T> {
+public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract<T> implements GenericDao<T> {
 
-    private final static Logger logger = LoggerFactory.getLogger(GenericDaoSpringJdbcImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(GenericDaoAbstractSpringJdbc.class);
     protected final JdbcTemplate jdbcTemplate;
     protected final String sqlSelectAll;
     protected final String sqlSelectUniqueEntity;
@@ -31,9 +29,8 @@ public abstract class GenericDaoSpringJdbcImpl<T> implements GenericDao<T> {
     protected final String databaseDialect;
     protected final String schema;
 
-    protected final  Class< T > type;
-
-    public GenericDaoSpringJdbcImpl(DataSource dataSource, String sqlSelectAll, PrimaryKey primaryKey){
+    public GenericDaoAbstractSpringJdbc(DataSource dataSource, String sqlSelectAll, PrimaryKey primaryKey){
+        super();
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.groupBy = "";
         this.orderBy = "";
@@ -51,10 +48,6 @@ public abstract class GenericDaoSpringJdbcImpl<T> implements GenericDao<T> {
         }
         sb.append(groupBy).append(orderBy);
         this.sqlSelectUniqueEntity = sb.toString();
-
-        Type t = getClass().getGenericSuperclass();
-        ParameterizedType pt = (ParameterizedType) t;
-        type = (Class) pt.getActualTypeArguments()[0];
 
     }
 

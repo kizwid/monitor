@@ -1,6 +1,6 @@
 package kizwid.sqlLoader.dao;
 
-import kizwid.shared.dao.GenericDaoSpringJdbcImpl;
+import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
 import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.util.FormatUtil;
 import kizwid.sqlLoader.domain.DatabaseRelease;
@@ -18,7 +18,7 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-01-31
  */
-public class DatabaseReleaseDaoImpl extends GenericDaoSpringJdbcImpl<DatabaseRelease> implements DatabaseReleaseDao{
+public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<DatabaseRelease> implements DatabaseReleaseDao{
     private final Logger logger = LoggerFactory.getLogger(DatabaseReleaseDaoImpl.class);
 
     public DatabaseReleaseDaoImpl(DataSource dataSource) {

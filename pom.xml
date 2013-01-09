@@ -20,6 +20,7 @@
         <module>kizwid-web-container</module>
         <module>kizwid-shared-dao</module>
         <module>kizwid-shared-database</module>
+        <module>kizwid-caterr-client</module>
     </modules>
 
     <build>

@@ -4,6 +4,11 @@ import kizwid.shared.util.EncryptedPropertyPlaceholderConfigurer;
 import org.dbmaintain.DbMaintainer;
 import org.dbmaintain.MainFactory;
 import org.dbmaintain.structure.clean.DBCleaner;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +19,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,7 +33,7 @@ import java.util.Properties;
 public class AbstractDatabaseTest {
 
     @Resource
-    protected DataSource datasource;
+    protected DataSource dataSource;
 
     @Resource
     protected EncryptedPropertyPlaceholderConfigurer commonProperties;
@@ -36,13 +42,14 @@ public class AbstractDatabaseTest {
     protected static DBCleaner dbCleaner;
     protected static MainFactory dbMaintainMainFactory;
 
+    private static Connection conn = null;
 
-    protected void initDataBase() throws URISyntaxException, IOException {
+    protected void initDataBase() throws URISyntaxException, IOException, SQLException {
         createDBMainainer().updateDatabase(false);
         createDBCleaner().cleanDatabase();
     }
 
-    private MainFactory createDBMaintainMainFactory() throws URISyntaxException, IOException {
+    private MainFactory createDBMaintainMainFactory() throws URISyntaxException, IOException, SQLException {
         if (dbMaintainMainFactory == null) {
             URL resource = ClassLoader.getSystemClassLoader().getResource("dbmaintain.properties");
             File file = new File(resource.toURI());
@@ -50,17 +57,18 @@ public class AbstractDatabaseTest {
             properties.load(new FileInputStream(file));
             commonProperties.processProperties(properties);//resolve placeholders
             dbMaintainMainFactory = new MainFactory(properties);
+            conn = dataSource.getConnection();
         }
         return dbMaintainMainFactory;
     }
 
-    private DBCleaner createDBCleaner() throws URISyntaxException, IOException {
+    private DBCleaner createDBCleaner() throws URISyntaxException, IOException, SQLException {
         createDBMaintainMainFactory();
         dbCleaner = dbMaintainMainFactory.createDBCleaner();
         return dbCleaner;
     }
 
-    private DbMaintainer createDBMainainer() throws URISyntaxException, IOException {
+    private DbMaintainer createDBMainainer() throws URISyntaxException, IOException, SQLException {
         createDBMaintainMainFactory();
         dbMaintainer = dbMaintainMainFactory.createDbMaintainer();
         return dbMaintainer;
@@ -71,7 +79,7 @@ public class AbstractDatabaseTest {
 
         initDataBase();
 
-        Connection connection = datasource.getConnection();
+        Connection connection = dataSource.getConnection();
         {
             PreparedStatement statement = connection.prepareStatement("SELECT sysdate FROM dual");
             boolean execute = statement.execute();
@@ -86,4 +94,15 @@ public class AbstractDatabaseTest {
 
         connection.commit();
     }
+
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        //capture final state of database
+        IDatabaseConnection connection = new DatabaseConnection(conn);
+        // full database export
+        IDataSet fullDataSet = connection.createDataSet();
+        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("full-dataset-dbmaintain.xml"));
+    }
+
 }

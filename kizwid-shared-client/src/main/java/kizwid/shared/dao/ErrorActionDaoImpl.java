@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class ErrorActionDaoImpl extends GenericDaoSpringJdbcImpl<ErrorAction> implements ErrorActionDao {
+public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction> implements ErrorActionDao {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorActionDaoImpl.class);
     public static final SimpleDateFormat YYYYMMDD = new SimpleDateFormat("yyyyMMdd");
