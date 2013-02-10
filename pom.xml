@@ -15,12 +15,12 @@
 
     <modules>
         <module>kizwid-shared-util</module>
-        <module>kizwid-shared-client</module>
         <module>kizwid-webapp</module>
         <module>kizwid-web-container</module>
         <module>kizwid-shared-dao</module>
         <module>kizwid-shared-database</module>
         <module>kizwid-caterr-client</module>
+        <module>kizwid-shared-domain</module>
     </modules>
 
     <build>

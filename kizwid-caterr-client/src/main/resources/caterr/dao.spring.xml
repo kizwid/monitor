@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		">
+
+    <import resource="classpath:caterr/jdbc.spring.xml" />
+
+    <bean id="pricingErrorDao" class="kizwid.caterr.dao.PricingErrorDaoImpl">
+    <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="errorEventDao" class="kizwid.caterr.dao.ErrorEventDaoImpl">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="pricingErrorDao"/>
+    </bean>
+
+    <bean id="errorActionDao" class="kizwid.caterr.dao.ErrorActionDaoImpl">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="pricingErrorDao"/>
+    </bean>
+
+    <bean id="pricingRunDao" class="kizwid.caterr.dao.PricingRunDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="errorDetailViewDao" class="kizwid.caterr.dao.ErrorDetailViewDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="errorSummaryViewDao" class="kizwid.caterr.dao.ErrorSummaryViewDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+</beans>

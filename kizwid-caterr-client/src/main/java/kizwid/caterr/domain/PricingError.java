@@ -1,16 +1,15 @@
 package kizwid.caterr.domain;
 
+import kizwid.shared.dao.Identifiable;
+import kizwid.shared.dao.PrimaryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="pricing_error")
-public class PricingError {
+public class PricingError  extends BaseObject implements Identifiable {
 
     private static final Logger logger = LoggerFactory.getLogger(PricingError.class);
 
@@ -132,4 +131,10 @@ public class PricingError {
         result = 31 * result + (errorMessage != null ? errorMessage.hashCode() : 0);
         return result;
     }
+
+    @Transient
+    public PrimaryKey getPrimaryKey(){
+        return createPrimaryKey(new String[]{"pricing_error_id"}, getPricingErrorId());
+    }
+
 }

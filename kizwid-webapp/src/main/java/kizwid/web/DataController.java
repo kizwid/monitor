@@ -1,6 +1,6 @@
 package kizwid.web;
 
-import kizwid.shared.dao.*;
+import kizwid.caterr.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +24,7 @@ public class DataController extends ErrorController {
     private final static Map<String,Map<String,Integer>> dummyJobStats = new HashMap<String, Map<String,Integer>>();
     private final static Map<String,List<String>> dummyErrors = new HashMap<String,List<String>>();
     private final String env;
-    private Map<String,String> sambaMapping;
+    private Map<String,String> miscContext;
 
     static {
         String[] jobs = new String[]{"group1","group2","group3","group4","group5","group6","group7"};
@@ -48,12 +48,12 @@ public class DataController extends ErrorController {
                           PricingRunDao pricingRunDao,
                           ErrorSummaryViewDao errorSummaryViewDao,
                           ErrorDetailViewDao errorDetailViewDao,
-                          Map<String, String> sambaMapping,
+                          Map<String, String> miscContext,
                           String env) {
         super(jdbcTemplate, errorEventDao, errorActionDao,
-                pricingErrorDao,pricingRunDao,errorSummaryViewDao, errorDetailViewDao,"", "","", sambaMapping, env);
-        this.sambaMapping = sambaMapping;
-        this.env = env;
+                pricingErrorDao,pricingRunDao,errorSummaryViewDao, errorDetailViewDao, miscContext);
+        this.miscContext = miscContext;
+        this.env = miscContext.get("env");
     }
 
     @Override
@@ -75,7 +75,7 @@ public class DataController extends ErrorController {
             out.flush();
         }else if("LatestId".equals(action)){
             response.setContentType("text/plain");
-            //TODO: use updater thread so that all clients use shared cache
+            //TODO: use updater thread so that all clients use caterr cache
             out.println(super.getLatestHash());
             out.flush();
         }else if("GetEnvironmentName".equals(action)){
@@ -93,7 +93,7 @@ public class DataController extends ErrorController {
                 //attempt to substitute samba.root for file.root
                 //thus will open file from path mounted on webserver
                 //OR print the samba friendly name for our users
-                for (Map.Entry<String, String> entry : sambaMapping.entrySet()) {
+                for (Map.Entry<String, String> entry : miscContext.entrySet()) {
                     if(filePath.startsWith(entry.getKey() + "/")){
                         filePath = filePath.replace(entry.getKey(), entry.getValue());
                         file = new File(filePath);

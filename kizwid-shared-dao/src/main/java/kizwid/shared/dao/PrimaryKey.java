@@ -3,7 +3,6 @@ package kizwid.shared.dao;
 /**
  *
  */
-public interface PrimaryKey {
-    String[] getFields();
+public interface PrimaryKey extends PrimaryKeyDef{
     Object[] getValues();
 }

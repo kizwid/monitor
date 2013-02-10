@@ -1,9 +1,10 @@
 package kizwid.web;
 
-import kizwid.shared.dao.*;
+import kizwid.caterr.dao.*;
+import kizwid.caterr.domain.*;
+import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.dao.discriminator.SimpleCriterion;
-import kizwid.shared.domain.*;
 import kizwid.shared.util.FormatUtil;
 import kizwid.web.util.CalcDigest;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import org.springframework.web.servlet.mvc.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.*;
@@ -36,8 +36,6 @@ public class ErrorController implements Controller {
     public static final String ACTION_DROP_ERROR_ACTION = "DropErrorAction";
     public static final String ACTION_SIMULATE = "Simulate";
     public static final String ACTION_SHOW_ERROR_ACTION_DETAILS = "ShowErrorActionDetails";
-    public static final String ACTION_LIST_LOG_FILES = "List log files";
-    public static final String ACTION_LOAD_FROM_LOG = "LoadFromLog";
     public static final String VIEW_LOGIN = "login";
     public static final String VIEW_DASHBOARD = "dashboard";
     public static final String VIEW_ERROR_ACTION = "errorAction";
@@ -67,10 +65,7 @@ public class ErrorController implements Controller {
     private ErrorSummaryViewDao errorSummaryViewDao;
     private ErrorDetailViewDao errorDetailViewDao;
     private PricingRunDao pricingRunDao;
-    private String sambaStaging;
-    private String sambaPricingLogBase;
-    private String sambaAppLogBase;
-    private Map<String,String> sambaMapping;
+    private Map<String,String> miscContext;
 
     //for testing
     private static int latestErrorEventId;
@@ -88,10 +83,7 @@ public class ErrorController implements Controller {
                            PricingRunDao pricingRunDao,
                            ErrorSummaryViewDao errorSummaryViewDao,
                            ErrorDetailViewDao errorDetailViewDao,
-                           String sambamonitorAppStaging,
-                           String sambaPricingLogBase,
-                           String sambamonitorAppLogBase,
-                           Map<String, String> sambaMapping, String env) {
+                           Map<String, String> miscContext) {
         this.jdbcTemplate = jdbcTemplate;
          this.errorEventDao = errorEventDao;
         this.errorActionDao = errorActionDao;
@@ -99,11 +91,8 @@ public class ErrorController implements Controller {
         this.pricingRunDao = pricingRunDao;
         this.errorSummaryViewDao = errorSummaryViewDao;
         this.errorDetailViewDao = errorDetailViewDao;
-        this.sambaStaging = sambaStaging;
-        this.sambaPricingLogBase = sambaPricingLogBase;
-        this.sambaAppLogBase = sambamonitorAppLogBase;
-        this.sambaMapping = sambaMapping;
-        this.env = env;
+        this.miscContext = miscContext;
+        this.env = miscContext.get("env");
         isDev = "dev".equals(env);
         logger.info("env [{}]", env);
     }
@@ -199,7 +188,7 @@ public class ErrorController implements Controller {
             addDetailCriteria(filter, filterColumn, criteria);
 
             List<ErrorDetailView> errorDetailViews =
-                    errorDetailViewDao.read(ErrorDetailView.class, criteria);
+                    errorDetailViewDao.find(criteria);
             model.put(PARAM_ERROR_DETAIL_VIEWS, errorDetailViews);
 
             if (errorDetailViews.size() > 0) {
@@ -238,11 +227,21 @@ public class ErrorController implements Controller {
 
         } else if (ACTION_DROP_ERROR_ACTION.equals(action)) {
             //remove all pricingErrors associated with selected errorAction
-            long id = readErrorActionId(request, model);
+            final long id = readErrorActionId(request, model);
             if (id == -1L) {
                 model.put(PARAM_VALIDATION_ERROR, "You can't drop 'New Errors'!");
             } else {
-                errorSummaryViewDao.deleteById(ErrorSummaryView.class, id);
+                errorSummaryViewDao.deleteById(new PrimaryKey() {
+                    @Override
+                    public Object[] getValues() {
+                        return new Object[]{id};
+                    }
+
+                    @Override
+                    public String[] getFields() {
+                        return new String[]{"error_action_id"};
+                    }
+                });
             }
             dashboard(request, model);
             return new ModelAndView(VIEW_DASHBOARD, model);
@@ -271,41 +270,12 @@ public class ErrorController implements Controller {
                 //load custom summary/details to view
                 dashboard(
                         request, model,
-                        errorSummaryViewDao.read(ErrorSummaryView.class, criteria),
-                        errorDetailViewDao.read(ErrorDetailView.class, criteria)
+                        errorSummaryViewDao.find(criteria),
+                        errorDetailViewDao.find(criteria)
                 );
 
                 return new ModelAndView(VIEW_ERROR_ACTION, model); //details for specific errorAction
             }
-
-        } else if (ACTION_LIST_LOG_FILES.equals(action) && isDev) {
-            String dir = readParam(model, request, PARAM_DIR, sambaAppLogBase);
-            File fileDir = new File(dir);
-
-            if (!fileDir.exists()) {
-                for (Map.Entry<String, String> entry : sambaMapping.entrySet()) {
-                    if (dir.startsWith(entry.getKey() + "/")) {
-                        dir = dir.replace(entry.getKey(), entry.getValue());
-                        fileDir = new File(dir);
-                        break;
-                    }
-                }
-            }
-
-            logger.info("file {} exists {}", fileDir, fileDir.exists());
-            File[] files = new File[0];
-            if (fileDir.exists()) {
-                files = fileDir.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        logger.info("checking {}", name);
-                        return name.startsWith("Jobstatus");
-                    }
-                });
-                logger.info("filecount {}", files.length);
-            }
-            model.put(PARAM_FILES, Arrays.asList(files));
-            return new ModelAndView(VIEW_LIST_LOG_FILES, model);
 
         } else {
             dashboard(request, model);
@@ -360,8 +330,6 @@ public class ErrorController implements Controller {
         readParam(model, request, PARAM_USER, ANONYMOUS);
         readParam(model, request, PARAM_COMMENT, "");
         readParam(model, request, PARAM_ID, "-1");
-        readParam(model, request, "SambamonitorAppStaging", sambaStaging);
-        readParam(model, request, "SambaPricingLogBase", sambaPricingLogBase);
 
         //default sort details by error timestamp
         final Comparator<ErrorDetailView> detailViewComparator = new Comparator<ErrorDetailView>() {
@@ -420,12 +388,12 @@ public class ErrorController implements Controller {
         //summary (actions for today)
         SimpleCriteria criteria = createSummaryCriteria(yyyymmdd);
         List<ErrorSummaryView> errorSummaryViews =
-                errorSummaryViewDao.read(ErrorSummaryView.class, criteria);
+                errorSummaryViewDao.find(criteria);
 
         //add filter to detail view only
         addDetailCriteria(filter, filterColumn, criteria);
         List<ErrorDetailView> errorDetailViews =
-                errorDetailViewDao.read(ErrorDetailView.class, criteria);
+                errorDetailViewDao.find(criteria);
 
         return dashboard(request, model, errorSummaryViews, errorDetailViews);
 
@@ -532,8 +500,7 @@ public class ErrorController implements Controller {
     //latest pending error
     String getLatestHash() throws NoSuchAlgorithmException {
         List<ErrorSummaryView> errorSummaryViews =
-                errorSummaryViewDao.read(
-                        ErrorSummaryView.class,
+                errorSummaryViewDao.find(
                         createSummaryCriteria(parseDate(null)));
 
         return getLatestHash(errorSummaryViews);

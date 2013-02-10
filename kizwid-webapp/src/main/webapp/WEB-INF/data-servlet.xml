@@ -6,13 +6,11 @@
 	    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 		">
 
-    <import resource="classpath:server/dao.spring.xml" />
+    <import resource="classpath:caterr/dao.spring.xml" />
     <import resource="classpath:sqlLoader/sqlLoader.spring.xml" />
 
-    <util:map id="sambaMapper" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
-        <entry key="//${samba.host}/${samba.share.staging}"  value="${file.root.staging}" />
-        <entry key="//${samba.host}/${samba.share.calc-log}" value="${file.root.calc-log}" />
-        <entry key="//${samba.host}/${samba.share.log}"      value="${file.root.log}" />
+    <util:map id="miscContext" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+        <entry key="env"  value="${monitorApp.env}" />
     </util:map>
 
     <bean id="dataController" class="kizwid.web.DataController">
@@ -23,8 +21,7 @@
         <constructor-arg ref="pricingRunDao" />
         <constructor-arg ref="errorSummaryViewDao" />
         <constructor-arg ref="errorDetailViewDao" />
-        <constructor-arg ref="sambaMapper" />
-        <constructor-arg value="${monitorApp.env}" />
+        <constructor-arg ref="miscContext" />
     </bean>
 
     <!-- you can have more than one handler defined -->

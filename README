@@ -4,4 +4,4 @@ non-trivial example of spring/hibernate/jetty webapp for viewing data in databas
 ------------------------------------------------
 -- dependency
 ------------------------------------------------
-shared-util <- shared-database
+caterr-util <- caterr-database

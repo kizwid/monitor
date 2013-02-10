@@ -52,7 +52,8 @@ public class GenericDaoAbstractHibernate<T> extends GenericDaoAbstract<T> implem
 
     @Override
     public T findById(PrimaryKey pk) {
-        return (T) hibernateTemplate.get(type, pk.getValues());
+        Long id = Long.valueOf(pk.getValues()[0].toString());
+        return (T) hibernateTemplate.get(type, id);
     }
 
     @Override

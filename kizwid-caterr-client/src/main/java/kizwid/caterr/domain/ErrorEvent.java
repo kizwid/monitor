@@ -1,5 +1,8 @@
 package kizwid.caterr.domain;
 
+import kizwid.shared.dao.Identifiable;
+import kizwid.shared.dao.PrimaryKey;
+
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "error_event")
-public class ErrorEvent {
+public class ErrorEvent extends BaseObject implements Identifiable {
 
     private long errorEventId = -1;
     private String launchEventId;
@@ -168,4 +171,10 @@ public class ErrorEvent {
         result = 31 * result + (pricingErrors != null ? pricingErrors.hashCode() : 0);
         return result;
     }
+
+    @Transient
+    public PrimaryKey getPrimaryKey(){
+        return createPrimaryKey(new String[]{"error_event_id"}, getErrorEventId());
+    }
+
 }

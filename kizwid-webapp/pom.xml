@@ -95,6 +95,19 @@
 
     <dependencies>
 
+        <!-- home brewed-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>kizwid-caterr-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>kizwid-shared-domain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>kizwid-shared-database</artifactId>
