@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.util.*;
 
@@ -18,7 +19,7 @@ import java.util.*;
  * Time: 23:32
  * To change this template use File | Settings | File Templates.
  */
-public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract<T> implements GenericDao<T> {
+public abstract class GenericDaoAbstractSpringJdbc<T extends Identifiable<ID>, ID extends Serializable> extends GenericDaoAbstract<T,ID> implements GenericDao<T,ID> {
 
     private final static Logger logger = LoggerFactory.getLogger(GenericDaoAbstractSpringJdbc.class);
     protected final JdbcTemplate jdbcTemplate;
@@ -29,7 +30,7 @@ public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract
     protected final String databaseDialect;
     protected final String schema;
 
-    public GenericDaoAbstractSpringJdbc(DataSource dataSource, String sqlSelectAll, PrimaryKey primaryKey){
+    public GenericDaoAbstractSpringJdbc(DataSource dataSource, String sqlSelectAll, String... idColumns){
         super();
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.groupBy = "";
@@ -40,7 +41,7 @@ public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract
         StringBuilder sb = new StringBuilder(this.sqlSelectAll);
         sb.append(" where ");
         boolean first = true;
-        for(String field: primaryKey.getFields()){
+        for(String field: idColumns){
             if(!first){
                 sb.append(" and ");
             }
@@ -60,19 +61,19 @@ public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract
     }
 
     @Override
-    public void deleteById(PrimaryKey primaryKey) {
+    public void deleteById(ID primaryKey) {
         int fromPos = fromPosition();
         String sql = "delete " + sqlSelectUniqueEntity.substring(fromPos);
-        int count = jdbcTemplate.update(sql, primaryKey.getValues());
+        int count = jdbcTemplate.update(sql, primaryKey);
         if(count != 1){
             throw new IllegalStateException("expected to delete 1 item but deleted " + count);
         }
     }
 
     @Override
-    public T findById(PrimaryKey primaryKey) {
+    public T findById(ID primaryKey) {
         List<T> entities = jdbcTemplate.query(sqlSelectUniqueEntity,
-                primaryKey.getValues(),
+                idToObjectArray(primaryKey),
                 createRowMapper());
         if(entities.size() > 1){
             throw new IllegalStateException("found multiple values with same primaryKey");
@@ -105,12 +106,19 @@ public abstract class GenericDaoAbstractSpringJdbc<T> extends GenericDaoAbstract
     }
 
     @Override
-    public boolean exists(PrimaryKey primaryKey) {
+    public boolean exists(ID primaryKey) {
         int fromPos = fromPosition();
         String sql = "select count(*) " + sqlSelectUniqueEntity.substring(fromPos);
-        int count = jdbcTemplate.update(sql, primaryKey.getValues());
+        int count = jdbcTemplate.update(sql, primaryKey);
         return count > 0;
     }
+
+    private Object[] idToObjectArray(ID id) {
+   		if (id instanceof Object[])
+   			return (Object[]) id;
+   		else
+   			return new Object[]{id};
+   	}
 
     private int fromPosition() {
         return sqlSelectUniqueEntity.toLowerCase().indexOf(" from ");

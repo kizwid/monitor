@@ -21,7 +21,7 @@ public class PricingErrorDaoTest extends DatabaseTxTestFixture{
 
         PricingError pricingError = new PricingError();
         pricingError.setErrorEventId(-1);
-        pricingError.setPricingErrorId(-1); //only works when this is the first entry
+        pricingError.setId(-1); //only works when this is the first entry
         pricingError.setDictionary("DICT");
         pricingError.setMarketData("MKT");
         pricingError.setSplit("SPLIT");
@@ -31,7 +31,7 @@ public class PricingErrorDaoTest extends DatabaseTxTestFixture{
         for (PricingError error : pricingErrorDao.find(SimpleCriteria.EMPTY_CRITERIA)) {
             System.out.println(error);
         }
-        PricingError check = pricingErrorDao.findById(pricingError.getPrimaryKey());
+        PricingError check = pricingErrorDao.findById(pricingError.getId());
 
         Assert.assertEquals(pricingError, check);
 

@@ -2,7 +2,6 @@ package kizwid.caterr.dao;
 
 import kizwid.caterr.domain.PricingError;
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -17,23 +16,13 @@ import java.util.List;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class PricingErrorDaoImpl extends GenericDaoAbstractSpringJdbc<PricingError> implements PricingErrorDao {
+public class PricingErrorDaoImpl extends GenericDaoAbstractSpringJdbc<PricingError, Long> implements PricingErrorDao {
     private final static Logger logger = LoggerFactory.getLogger(PricingErrorDaoImpl.class);
 
     public PricingErrorDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.pricing_error",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"pricing_error_id"};
-                    }
-
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "pricing_error_id");
     }
 
     //------------------------------------------------------
@@ -43,7 +32,7 @@ public class PricingErrorDaoImpl extends GenericDaoAbstractSpringJdbc<PricingErr
     public void save(PricingError pricingError) {
         String msg = String.format("PricingError row (%s,%s,%s,%s,%s,%s)",
                 new Object[]{
-                        pricingError.getPricingErrorId(),
+                        pricingError.getId(),
                         pricingError.getErrorEventId(),
                         pricingError.getDictionary(),
                         pricingError.getMarketData(),
@@ -53,11 +42,11 @@ public class PricingErrorDaoImpl extends GenericDaoAbstractSpringJdbc<PricingErr
 
         try {
             long nextId = nextId();
-            pricingError.setPricingErrorId(nextId);
+            pricingError.setId(nextId);
             String sql = "INSERT INTO MONITOR_APP_USER.pricing_error ( pricing_error_id, error_event_id, dictionary, market_data, split, error_message ) " +
                     "VALUES ( ?, ?, ?, ?, ?, ? )";
             jdbcTemplate.update(dialectFriendlySql(sql),
-                    pricingError.getPricingErrorId(),
+                    pricingError.getId(),
                     pricingError.getErrorEventId(),
                     pricingError.getDictionary(),
                     pricingError.getMarketData(),

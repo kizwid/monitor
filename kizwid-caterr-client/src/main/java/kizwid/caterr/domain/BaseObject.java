@@ -1,7 +1,5 @@
 package kizwid.caterr.domain;
 
-import kizwid.shared.dao.PrimaryKey;
-
 /**
  * Created with IntelliJ IDEA.
  * User: kevsanders
@@ -10,17 +8,7 @@ import kizwid.shared.dao.PrimaryKey;
  * To change this template use File | Settings | File Templates.
  */
 public class BaseObject {
-    public static PrimaryKey createPrimaryKey(final String[] fields, final Object... values){
-        return new PrimaryKey() {
-            @Override
-            public Object[] getValues() {
-                return values;
-            }
-
-            @Override
-            public String[] getFields() {
-                return fields;
-            }
-        };
+    public static Object[] pk(final Object... idValues){
+        return idValues;
     }
 }

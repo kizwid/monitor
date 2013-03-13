@@ -1,7 +1,6 @@
 package kizwid.sqlLoader.dao;
 
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.util.FormatUtil;
 import kizwid.sqlLoader.domain.DatabaseRelease;
 import org.slf4j.Logger;
@@ -18,22 +17,13 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-01-31
  */
-public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<DatabaseRelease> implements DatabaseReleaseDao{
+public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<DatabaseRelease, String> implements DatabaseReleaseDao{
     private final Logger logger = LoggerFactory.getLogger(DatabaseReleaseDaoImpl.class);
 
     public DatabaseReleaseDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.database_release",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"script"};
-                    }
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "script");
     }
 
     //------------------------------------------------------
@@ -47,13 +37,13 @@ public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<Databas
                     "VALUES ( ?, to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF'))";    //to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF') <-> CAST(? AS TIMESTAMP)
             logger.debug(sql);
             jdbcTemplate.update(dialectFriendlySql(sql), new Object[]{
-                    databaseRelease.getScript(),
+                    databaseRelease.getId(),
                     FormatUtil.formatSqlDateTime(databaseRelease.getDeployed_at())
             });
 
         } catch (DataAccessException exc) {
             logger.error("SAVE DatabaseRelease FAILED! {} {}",
-                    new Object[]{databaseRelease.getScript(),
+                    new Object[]{databaseRelease.getId(),
                     FormatUtil.formatSqlDateTime(databaseRelease.getDeployed_at())}, exc);
             throw exc;
         }

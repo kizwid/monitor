@@ -1,12 +1,14 @@
 package kizwid.caterr.domain;
 
+import kizwid.shared.dao.Identifiable;
+
 import java.util.Date;
 
 /**
  * User: kizwid
  * Date: 2012-02-21
  */
-public class PricingRun {
+public class PricingRun implements Identifiable<Long> {
 
     private final long runId;
     private final String runLabel;
@@ -23,7 +25,8 @@ public class PricingRun {
         this.createdAt = createdAt;
     }
 
-    public long getRunId() {
+    @Override
+    public Long getId() {
         return runId;
     }
 

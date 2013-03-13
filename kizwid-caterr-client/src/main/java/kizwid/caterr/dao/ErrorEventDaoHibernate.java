@@ -12,7 +12,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import java.util.List;
 
 public class ErrorEventDaoHibernate
-        extends GenericDaoAbstractHibernate<ErrorEvent> implements ErrorEventDao
+        extends GenericDaoAbstractHibernate<ErrorEvent, Long> implements ErrorEventDao
 {
 
     private final HibernateTemplate hibernateTemplate;
@@ -48,11 +48,11 @@ public class ErrorEventDaoHibernate
     }
 
     public void save(ErrorEvent errorEvent){
-        if(errorEvent.getErrorEventId() == -1){
+        if(errorEvent.getId() == -1){
             int nextId = 0;//TODO
             errorEvent.setErrorEventId(nextId);
             for (PricingError pricingError : errorEvent.getPricingErrors()) {
-                if(pricingError.getPricingErrorId() == -1){
+                if(pricingError.getId() == -1){
                     //todo:nextId
                 }
                 pricingError.setErrorEventId(nextId);

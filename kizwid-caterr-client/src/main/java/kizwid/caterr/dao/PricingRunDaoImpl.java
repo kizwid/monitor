@@ -2,7 +2,6 @@ package kizwid.caterr.dao;
 
 import kizwid.caterr.domain.PricingRun;
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,23 +17,13 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class PricingRunDaoImpl extends GenericDaoAbstractSpringJdbc<PricingRun> implements PricingRunDao {
+public class PricingRunDaoImpl extends GenericDaoAbstractSpringJdbc<PricingRun, Long> implements PricingRunDao {
     private final static Logger logger = LoggerFactory.getLogger(PricingRunDaoImpl.class);
 
     public PricingRunDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.pricing_run",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"pricing_run_id"};
-                    }
-
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "pricing_run_id");
     }
 
     //------------------------------------------------------
@@ -46,7 +35,7 @@ public class PricingRunDaoImpl extends GenericDaoAbstractSpringJdbc<PricingRun> 
             String sql = "INSERT INTO MONITOR_APP_USER.pricing_run ( pricing_run_id, run_label, business_date, config_id, created_at) " +
                     "VALUES ( ?, ?, ?, ?, to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF') )";
             jdbcTemplate.update(dialectFriendlySql(sql),
-                    pricingRun.getRunId(),
+                    pricingRun.getId(),
                     pricingRun.getRunLabel(),
                     pricingRun.getBusinessDate(),
                     pricingRun.getConfigId(),
@@ -56,7 +45,7 @@ public class PricingRunDaoImpl extends GenericDaoAbstractSpringJdbc<PricingRun> 
         } catch (DataAccessException exc) {
             logger.error("SAVE PricingRun FAILED inserting row {},{},{},{},{}",
                     new Object[]{
-                            pricingRun.getRunId(),
+                            pricingRun.getId(),
                             pricingRun.getRunLabel(),
                             pricingRun.getBusinessDate(),
                             pricingRun.getConfigId(),

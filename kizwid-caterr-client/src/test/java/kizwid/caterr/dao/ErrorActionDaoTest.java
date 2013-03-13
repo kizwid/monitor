@@ -2,7 +2,6 @@ package kizwid.caterr.dao;
 
 import kizwid.caterr.domain.ErrorAction;
 import kizwid.caterr.domain.PricingError;
-import kizwid.shared.dao.PrimaryKey;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.annotation.Rollback;
@@ -46,7 +45,7 @@ public class ErrorActionDaoTest extends DatabaseTxTestFixture{
         errorActionDao.save(firstErrorAction);
 
         //verify action was created
-        ErrorAction check = errorActionDao.findById(createErrorActionPk(firstErrorAction));
+        ErrorAction check = errorActionDao.findById(firstErrorAction.getId());
         Assert.assertEquals(firstErrorAction, check);
 
         String filter = "";
@@ -91,7 +90,7 @@ public class ErrorActionDaoTest extends DatabaseTxTestFixture{
         errorActionDao.save(filteredAction);
 
         //verify it was save correctly
-        ErrorAction checkFilter = errorActionDao.findById(createErrorActionPk(filteredAction));
+        ErrorAction checkFilter = errorActionDao.findById(filteredAction.getId());
         Assert.assertEquals(filteredAction, checkFilter);
 
 
@@ -99,20 +98,6 @@ public class ErrorActionDaoTest extends DatabaseTxTestFixture{
         List<ErrorAction> summary = errorActionDao.findByBusinessDate(20120202);
         System.out.println("summary: " + summary);
 
-    }
-
-    private PrimaryKey createErrorActionPk(final ErrorAction errorAction) {
-        return new PrimaryKey() {
-                @Override
-                public String[] getFields() {
-                    return new String[]{"error_action_id"};
-                }
-
-                @Override
-                public Object[] getValues() {
-                    return new Object[]{errorAction.getId()};
-                }
-            };
     }
 
 }

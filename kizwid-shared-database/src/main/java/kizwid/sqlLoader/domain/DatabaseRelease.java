@@ -1,5 +1,6 @@
 package kizwid.sqlLoader.domain;
 
+import kizwid.shared.dao.Identifiable;
 import kizwid.shared.util.FormatUtil;
 
 import java.util.Date;
@@ -8,7 +9,7 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-01-31
  */
-public class DatabaseRelease {
+public class DatabaseRelease implements Identifiable<String> {
     
     private String script;
     private Date deployed_at;
@@ -22,7 +23,8 @@ public class DatabaseRelease {
         this(script, new Date());
     }
 
-    public String getScript() {
+    @Override
+    public String getId() {
         return script;
     }
 

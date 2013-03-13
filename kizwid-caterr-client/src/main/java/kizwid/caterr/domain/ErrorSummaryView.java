@@ -1,12 +1,14 @@
 package kizwid.caterr.domain;
 
+import kizwid.shared.dao.Identifiable;
+
 import java.util.Date;
 
 /**
  * User: kizwid
  * Date: 2012-02-21
  */
-public class ErrorSummaryView {
+public class ErrorSummaryView implements Identifiable<Long> {
 
     private long errorActionId;
     private int businessDate;
@@ -87,5 +89,10 @@ public class ErrorSummaryView {
                 ", actionComment='" + actionComment + '\'' +
                 ", numberOfItems=" + numberOfItems +
                 '}';
+    }
+
+    @Override
+    public Long getId() {
+        return errorActionId;
     }
 }

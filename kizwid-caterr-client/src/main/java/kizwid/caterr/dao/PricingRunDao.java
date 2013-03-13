@@ -7,6 +7,6 @@ import kizwid.shared.dao.GenericDao;
  * User: kizwid
  * Date: 2012-02-16
  */
-public interface PricingRunDao extends GenericDao<PricingRun> {
+public interface PricingRunDao extends GenericDao<PricingRun, Long> {
 
 }

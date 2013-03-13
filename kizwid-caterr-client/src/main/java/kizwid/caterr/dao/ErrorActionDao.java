@@ -6,7 +6,7 @@ import kizwid.shared.dao.discriminator.SimpleCriteria;
 
 import java.util.List;
 
-public interface ErrorActionDao extends GenericDao<ErrorAction> {
+public interface ErrorActionDao extends GenericDao<ErrorAction, Long> {
     List<ErrorAction> findByBusinessDate(int businessDate);
     void attachPricingErrorsToAction(long errorActionId, List<Long> pricingErrorIds);
     void attachPricingErrorsFromCriteria(long errorActionId, SimpleCriteria criteria);

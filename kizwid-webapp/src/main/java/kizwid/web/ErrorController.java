@@ -2,7 +2,6 @@ package kizwid.web;
 
 import kizwid.caterr.dao.*;
 import kizwid.caterr.domain.*;
-import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.dao.discriminator.SimpleCriterion;
 import kizwid.shared.util.FormatUtil;
@@ -231,17 +230,7 @@ public class ErrorController implements Controller {
             if (id == -1L) {
                 model.put(PARAM_VALIDATION_ERROR, "You can't drop 'New Errors'!");
             } else {
-                errorSummaryViewDao.deleteById(new PrimaryKey() {
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[]{id};
-                    }
-
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"error_action_id"};
-                    }
-                });
+                errorSummaryViewDao.deleteById(id);
             }
             dashboard(request, model);
             return new ModelAndView(VIEW_DASHBOARD, model);
@@ -538,7 +527,7 @@ public class ErrorController implements Controller {
     private void saveRandomErrors(int numberToCreate) {
         final PricingRun pricingRun = new PricingRun(System.currentTimeMillis(), "dummy-run", parseDate(FormatUtil.yyyymmdd(new Date())), "some-config", new Date());
         pricingRunDao.save(pricingRun);
-        errorEventDao.saveAll(createRandomErrorEvents(numberToCreate, pricingRun.getRunId()));
+        errorEventDao.saveAll(createRandomErrorEvents(numberToCreate, pricingRun.getId()));
     }
 
     List<ErrorEvent> createRandomErrorEvents(int numberToCreate, long runId){
@@ -597,7 +586,7 @@ public class ErrorController implements Controller {
     }
 
     PricingError createPricingError(String dictionary, String marketData, String split, String errorMessage, ErrorEvent errorEvent) {
-        return new PricingError(errorEvent.getErrorEventId(),-1,
+        return new PricingError(errorEvent.getId(),-1,
                 dictionary,marketData,split,errorMessage);
     }
 

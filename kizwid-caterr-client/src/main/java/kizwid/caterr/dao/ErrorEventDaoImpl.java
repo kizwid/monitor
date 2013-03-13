@@ -3,7 +3,6 @@ package kizwid.caterr.dao;
 import kizwid.caterr.domain.ErrorEvent;
 import kizwid.caterr.domain.PricingError;
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.dao.discriminator.SimpleCriterion;
 import kizwid.shared.util.FormatUtil;
@@ -18,7 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> implements ErrorEventDao {
+public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent, Long> implements ErrorEventDao {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorEventDaoImpl.class);
     private final PricingErrorDao pricingErrorDao;
@@ -26,17 +25,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
     public ErrorEventDaoImpl(DataSource dataSource, PricingErrorDao pricingErrorDao) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.error_event",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"error_event_id"};
-                    }
-
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "error_event_id");
         this.pricingErrorDao = pricingErrorDao;
     }
 
@@ -44,7 +33,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
     // BaseDao implementation
     //------------------------------------------------------
     @Override
-    public ErrorEvent findById(PrimaryKey pk) {
+    public ErrorEvent findById(Long pk) {
         ErrorEvent entity = super.findById(pk);
         attachChildren(Collections.singletonList((ErrorEvent)entity));
         return entity;
@@ -67,7 +56,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
                     "VALUES ( ?,?, to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF'), ?, ?, ?, ? )"; //to_timestamp(?, 'YYYY-MM-DD HH24:MI:SS.FF') <-> CAST(? AS TIMESTAMP)
             logger.debug(sql);
 
-            jdbcTemplate.update(dialectFriendlySql(sql), errorEvent.getErrorEventId(), errorEvent.getLaunchEventId(),
+            jdbcTemplate.update(dialectFriendlySql(sql), errorEvent.getId(), errorEvent.getLaunchEventId(),
                     FormatUtil.formatSqlDateTime(errorEvent.getCreatedAt()),
                     errorEvent.getRunId(), errorEvent.getRollupName(),
                     errorEvent.getRiskGroupName(), errorEvent.getBatchName());
@@ -80,7 +69,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
         } catch (DataAccessException exc) {
             logger.error("SAVE ErrorEvent FAILED inserting row {},{},{},{},{},{},{}",
                     new Object[]{
-                            errorEvent.getErrorEventId(),
+                            errorEvent.getId(),
                             errorEvent.getLaunchEventId(),
                             FormatUtil.formatSqlDateTime(errorEvent.getCreatedAt()),
                             errorEvent.getRunId(),
@@ -112,7 +101,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
 
         //then attach lists of errors
         for (ErrorEvent event : events) {
-            List<PricingError> errors = pricingErrorDao.findByErrorEventId(event.getErrorEventId());
+            List<PricingError> errors = pricingErrorDao.findByErrorEventId(event.getId());
             event.setPricingErrors(errors);
         }
 
@@ -144,17 +133,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
         //fetch the errorEvent details
         List<ErrorEvent> events = new ArrayList<ErrorEvent>(eventToErrorList.size());
         for (final Long errorEventId : eventToErrorList.keySet()) {
-            ErrorEvent errorEvent = findById(new PrimaryKey() {
-                @Override
-                public String[] getFields() {
-                    return new String[]{"error_event_id"};
-                }
-
-                @Override
-                public Object[] getValues() {
-                    return new Object[]{errorEventId};
-                }
-            });
+            ErrorEvent errorEvent = findById(errorEventId);
             //attach the unactioned errors for this errorEvent
             errorEvent.setPricingErrors(eventToErrorList.get(errorEventId));
             events.add(errorEvent);
@@ -184,17 +163,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
         //fetch the errorEvent details
         List<ErrorEvent> events = new ArrayList<ErrorEvent>(eventToErrorList.size());
         for (final Long errorEventId : eventToErrorList.keySet()) {
-            ErrorEvent errorEvent = findById(new PrimaryKey() {
-                @Override
-                public String[] getFields() {
-                    return new String[]{"error_event_id"};
-                }
-
-                @Override
-                public Object[] getValues() {
-                    return new Object[]{errorEventId};
-                }
-            });
+            ErrorEvent errorEvent = findById(errorEventId);
             //attach the actioned errors for this errorEvent
             errorEvent.setPricingErrors(eventToErrorList.get(errorEventId));
             events.add(errorEvent);
@@ -238,7 +207,7 @@ public class ErrorEventDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorEvent> 
 
     private void attachChildren(List<ErrorEvent> events) {
         for (ErrorEvent event : events) {
-            List<PricingError> errors = pricingErrorDao.findByErrorEventId(event.getErrorEventId());
+            List<PricingError> errors = pricingErrorDao.findByErrorEventId(event.getId());
             event.setPricingErrors(errors);
         }
     }

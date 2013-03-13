@@ -1,12 +1,14 @@
 package kizwid.caterr.domain;
 
+import kizwid.shared.dao.Identifiable;
+
 import java.util.Date;
 
 /**
  * User: kizwid
  * Date: 2012-02-21
  */
-public class ErrorDetailView {
+public class ErrorDetailView implements Identifiable<Object[]> {
 
     private final long errorActionId,runId,errorEventId,pricingErrorId;
     private final String updatedBy,
@@ -215,5 +217,10 @@ public class ErrorDetailView {
                 ", actionUpdatedAt=" + actionUpdatedAt +
                 ", errorCreatedAt=" + errorCreatedAt +
                 '}';
+    }
+
+    @Override
+    public Object[] getId() {
+        return BaseObject.pk(errorActionId, pricingErrorId);
     }
 }

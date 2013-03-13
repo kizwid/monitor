@@ -10,7 +10,7 @@ import java.util.List;
  * User: kizwid
  * Date: 2012-02-16
  */
-public interface ErrorEventDao extends GenericDao<ErrorEvent> {
+public interface ErrorEventDao extends GenericDao<ErrorEvent, Long> {
     List<ErrorEvent> findByRiskGroup(String riskGroup);
     List<ErrorEvent> findUnActioned(String filter);
     List<ErrorEvent> findByErrorActionId(long id);

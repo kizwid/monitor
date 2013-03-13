@@ -2,7 +2,6 @@ package kizwid.caterr.dao;
 
 import kizwid.caterr.domain.ErrorDetailView;
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,23 +15,13 @@ import java.util.Date;
  * User: kizwid
  * Date: 2012-02-02
  */
-public class ErrorDetailViewDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorDetailView> implements ErrorDetailViewDao {
+public class ErrorDetailViewDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorDetailView, Object[]> implements ErrorDetailViewDao {
     private final static Logger logger = LoggerFactory.getLogger(ErrorDetailViewDaoImpl.class);
 
     public ErrorDetailViewDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.v_error_details",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"pricing_run_id"};
-                    }
-
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "error_action_id", "pricing_error_id");
     }
 
     //------------------------------------------------------

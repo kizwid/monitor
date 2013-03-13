@@ -1,7 +1,6 @@
 package kizwid.caterr.domain;
 
 import kizwid.shared.dao.Identifiable;
-import kizwid.shared.dao.PrimaryKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "error_action")
-public class ErrorAction extends BaseObject implements Identifiable {
+public class ErrorAction extends BaseObject implements Identifiable<Long> {
 
     private long id;
     private int businessDate;
@@ -42,7 +41,7 @@ public class ErrorAction extends BaseObject implements Identifiable {
 
     @Id
     @Column(name = "error_action_id", unique = true, nullable = false)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -124,10 +123,6 @@ public class ErrorAction extends BaseObject implements Identifiable {
     //hmmm
     public void setId(long id) {
         this.id = id;
-    }
-
-    public PrimaryKey getPrimaryKey(){
-        return createPrimaryKey(new String[]{"error_action_id"}, getId());
     }
 
 }

@@ -2,6 +2,7 @@ package kizwid.caterr.dao;
 
 import kizwid.caterr.domain.ErrorEvent;
 import kizwid.sqlLoader.dao.DatabaseReleaseDao;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,7 @@ import javax.annotation.Resource;
  * Date: 2012-01-30
  */
 
-//@Ignore//TODO:until we decide on ORM strategy
+@Ignore//TODO:until we decide on ORM strategy
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:caterr/hibernate-dao.spring.xml"})
 public class ErrorEventDaoHibernateTest extends  DatabaseTxTestFixture{

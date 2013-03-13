@@ -14,12 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 
-public class GenericDaoAbstractHibernate<T> extends GenericDaoAbstract<T> implements GenericDao<T> {
+public class GenericDaoAbstractHibernate<T extends Identifiable<ID>, ID extends Serializable> extends GenericDaoAbstract<T, ID> implements GenericDao<T, ID> {
     private static final Logger logger = LoggerFactory.getLogger(GenericDaoAbstractHibernate.class);
 
     protected HibernateTemplate hibernateTemplate;
@@ -41,18 +42,17 @@ public class GenericDaoAbstractHibernate<T> extends GenericDaoAbstract<T> implem
     }
 
     @Override
-    public void deleteById(PrimaryKey pk) {
+    public void deleteById(ID pk) {
         T deletable = findById(pk);
         if (deletable != null) {
             delete(deletable);
         } else {
-            logger.warn("Attempted to delete an instance of: {} with id: {} but no such instance exists", type.getSimpleName(), pk.getValues());
+            logger.warn("Attempted to delete an instance of: {} with id: {} but no such instance exists", type.getSimpleName(), pk);
         }
     }
 
     @Override
-    public T findById(PrimaryKey pk) {
-        Long id = Long.valueOf(pk.getValues()[0].toString());
+    public T findById(ID id) {
         return (T) hibernateTemplate.get(type, id);
     }
 
@@ -90,7 +90,7 @@ public class GenericDaoAbstractHibernate<T> extends GenericDaoAbstract<T> implem
     }
 
     @Override
-    public boolean exists(PrimaryKey pk) {
+    public boolean exists(ID pk) {
         T found = findById(pk);
         return found != null;
     }

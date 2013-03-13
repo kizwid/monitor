@@ -165,7 +165,7 @@ public class SqlLoader {
             List<DatabaseRelease> releases = dao.find(SimpleCriteria.EMPTY_CRITERIA);
             Set<String> releaseFiles = new HashSet<String>();
             for (DatabaseRelease release : releases) {
-                releaseFiles.add(release.getScript());
+                releaseFiles.add(release.getId());
             }
             return releaseFiles;
         }

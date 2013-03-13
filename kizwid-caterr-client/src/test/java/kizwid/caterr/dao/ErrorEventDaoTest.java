@@ -25,7 +25,7 @@ public class ErrorEventDaoTest extends DatabaseTxTestFixture{
     public void canSaveAndRetrieve(){
         ErrorEvent errorEvent = createErrorEvent("a", "FOO", "BAR", "BAZ", 0, 2);
         errorEventDao.save(errorEvent);
-        ErrorEvent check = errorEventDao.findById(errorEvent.getPrimaryKey());
+        ErrorEvent check = errorEventDao.findById(errorEvent.getId());
         Assert.assertEquals(errorEvent, check);
     }
 
@@ -39,9 +39,9 @@ public class ErrorEventDaoTest extends DatabaseTxTestFixture{
         ErrorEvent errorEvent = createErrorEvent("a", "FOO", "BAR", "BAZ", 0, 3);
         errorEventDao.save(errorEvent);
 
-        ErrorEvent check = errorEventDao.findById(errorEvent.getPrimaryKey());
+        ErrorEvent check = errorEventDao.findById(errorEvent.getId());
         Assert.assertEquals(errorEvent, check);
-        Assert.assertEquals(errorEvent.getErrorEventId(), check.getErrorEventId());
+        Assert.assertEquals(errorEvent.getId(), check.getId());
         Assert.assertEquals(errorEvent.getPricingErrors().size(), check.getPricingErrors().size());
 
         assertEquals( "row count not expected: ", rowCountErrorEventBefore + 1, getRowCount("error_event"));
@@ -70,11 +70,11 @@ public class ErrorEventDaoTest extends DatabaseTxTestFixture{
 
         ErrorEvent errorEvent = createErrorEvent("a", "FOO", "BAR", "BAZ", 0, 1);
         errorEventDao.save(errorEvent);
-        ErrorEvent check = errorEventDao.findById(errorEvent.getPrimaryKey());
+        ErrorEvent check = errorEventDao.findById(errorEvent.getId());
         Assert.assertEquals(errorEvent, check);
 
-        long errorEventId = errorEventDao.lookupErrorEventIdFromLaunchEventId(errorEvent.getLaunchEventId());
-        Assert.assertEquals(errorEvent.getErrorEventId(), errorEventId);
+        Long errorEventId = errorEventDao.lookupErrorEventIdFromLaunchEventId(errorEvent.getLaunchEventId());
+        Assert.assertEquals(errorEvent.getId(), errorEventId);
         
             }
 

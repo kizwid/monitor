@@ -3,7 +3,6 @@ package kizwid.caterr.dao;
 import kizwid.caterr.domain.ErrorAction;
 import kizwid.caterr.domain.PricingError;
 import kizwid.shared.dao.GenericDaoAbstractSpringJdbc;
-import kizwid.shared.dao.PrimaryKey;
 import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.util.FormatUtil;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction> implements ErrorActionDao {
+public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction, Long> implements ErrorActionDao {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorActionDaoImpl.class);
     public static final SimpleDateFormat YYYYMMDD = new SimpleDateFormat("yyyyMMdd");
@@ -29,17 +28,7 @@ public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction
     public ErrorActionDaoImpl(DataSource dataSource, PricingErrorDao pricingErrorDao){
         super(dataSource,
                 "select * from MONITOR_APP_USER.error_action",
-                new PrimaryKey() {
-                    @Override
-                    public String[] getFields() {
-                        return new String[]{"error_action_id"};
-                    }
-
-                    @Override
-                    public Object[] getValues() {
-                        return new Object[0];
-                    }
-                });
+                "error_action_id");
         this.pricingErrorDao = pricingErrorDao;
     }
 
@@ -76,7 +65,7 @@ public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction
             //pricingErrors are never created by errorAction: only ever associated to one
             List<Long> pricingErrorIds = new ArrayList<Long>(errorAction.getPricingErrors().size());
             for (PricingError pricingError : errorAction.getPricingErrors()) {
-                pricingErrorIds.add(pricingError.getPricingErrorId());
+                pricingErrorIds.add(pricingError.getId());
             }
             attachPricingErrorsToAction(errorAction.getId(), pricingErrorIds);
 
@@ -98,7 +87,7 @@ public class ErrorActionDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorAction
 
 
     @Override
-    public ErrorAction findById(PrimaryKey primaryKey) {
+    public ErrorAction findById(Long primaryKey) {
         ErrorAction errorAction = super.findById(primaryKey);
         attachChildren(Collections.singletonList(errorAction));
         return errorAction;
