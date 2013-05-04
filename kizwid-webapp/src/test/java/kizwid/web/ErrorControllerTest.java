@@ -156,6 +156,7 @@ public class ErrorControllerTest {
                 resourceHandler.setResourceBase(webAppPath);
 
                 WebAppContext webAppContext = new WebAppContext();
+                logger.info("setting webapp descriptor path = " + webAppPath + "/WEB-INF/web.xml");
                 webAppContext.setDescriptor(webAppPath + "/WEB-INF/web.xml");
                 webAppContext.setResourceBase(webAppPath);
                 webAppContext.setContextPath(CONTEXTPATH);

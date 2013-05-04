@@ -42,12 +42,12 @@ public class DataController extends ErrorController {
     }
 
     public DataController(JdbcTemplate jdbcTemplate,
-                          ErrorEventDao errorEventDao,
-                          ErrorActionDao errorActionDao,
-                          PricingErrorDao pricingErrorDao,
-                          PricingRunDao pricingRunDao,
-                          ErrorSummaryViewDao errorSummaryViewDao,
-                          ErrorDetailViewDao errorDetailViewDao,
+                               ErrorEventDao errorEventDao,
+                               ErrorActionDao errorActionDao,
+                               PricingErrorDao pricingErrorDao,
+                               PricingRunDao pricingRunDao,
+                               ErrorSummaryViewDao errorSummaryViewDao,
+                               ErrorDetailViewDao errorDetailViewDao,
                           Map<String, String> miscContext,
                           String env) {
         super(jdbcTemplate, errorEventDao, errorActionDao,
