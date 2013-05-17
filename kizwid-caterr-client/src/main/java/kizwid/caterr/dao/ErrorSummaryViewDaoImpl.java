@@ -22,9 +22,10 @@ public class ErrorSummaryViewDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorS
     public ErrorSummaryViewDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select " + SQL_FIELD_LIST + ",count(*) num_items  from MONITOR_APP_USER.v_error_details",
-                "error_action_id"/*,
                 " group by " + SQL_FIELD_LIST,
-                " order by " + SQL_FIELD_LIST*/);
+                " order by " + SQL_FIELD_LIST,
+                new String[]{"error_action_id"}
+        );
     }
 
     //------------------------------------------------------

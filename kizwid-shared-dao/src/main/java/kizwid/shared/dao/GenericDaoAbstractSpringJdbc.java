@@ -31,10 +31,13 @@ public abstract class GenericDaoAbstractSpringJdbc<T extends Identifiable<ID>, I
     protected final String schema;
 
     public GenericDaoAbstractSpringJdbc(DataSource dataSource, String sqlSelectAll, String... idColumns){
+        this(dataSource, sqlSelectAll, "", "", idColumns);
+    }
+    public GenericDaoAbstractSpringJdbc(DataSource dataSource, String sqlSelectAll, String groupBy, String orderBy, String... idColumns){
         super();
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.groupBy = "";
-        this.orderBy = "";
+        this.groupBy = groupBy;
+        this.orderBy = orderBy;
         this.schema = extractSchema(TableAndSchemaExtractor.getTableNameFromSql(sqlSelectAll));
         this.databaseDialect = readDatabaseDialect(dataSource);
         this.sqlSelectAll = dialectFriendlySql(sqlSelectAll);

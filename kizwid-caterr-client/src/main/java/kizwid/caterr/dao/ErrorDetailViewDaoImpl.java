@@ -21,7 +21,7 @@ public class ErrorDetailViewDaoImpl extends GenericDaoAbstractSpringJdbc<ErrorDe
     public ErrorDetailViewDaoImpl(DataSource dataSource) {
         super(dataSource,
                 "select * from MONITOR_APP_USER.v_error_details",
-                "error_action_id", "pricing_error_id");
+                new String[]{"error_action_id", "pricing_error_id"});
     }
 
     //------------------------------------------------------

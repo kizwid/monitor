@@ -102,8 +102,11 @@ public class ErrorControllerTest {
 
 
     @Test
-    public void runForever() throws InterruptedException {
+    public void runForever() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
+        sw = new StringWriter();
+        get(URL_BASE + "Action=Simulate&User=unitTest", new PrintWriter(sw));
+        logger.info(URL_BASE + "Action=Simulate&User=unitTest");
         //latch.await();
     }
 
