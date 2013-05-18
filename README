@@ -1,7 +1,5 @@
-non-trivial example of spring/hibernate/jetty webapp for viewing data in database
-
-
-------------------------------------------------
--- dependency
-------------------------------------------------
-caterr-util <- caterr-database
+TODO: use dbMaintain instead of sqlLoader
+TODO: create base database test to load test data and rollback after each test
+TODO: use web server testing kit like htmlTest to check web UI functions
+TODO: create spring data version of DAO layer
+TODO: create CXF web service layer

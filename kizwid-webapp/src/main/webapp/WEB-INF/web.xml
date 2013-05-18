@@ -21,22 +21,9 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>data</servlet-name>
-        <servlet-class>
-            org.springframework.web.servlet.DispatcherServlet
-        </servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>errors</servlet-name>
         <url-pattern>/service/errors</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>data</servlet-name>
-        <url-pattern>/service/data</url-pattern>
     </servlet-mapping>
 
     <login-config>

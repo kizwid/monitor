@@ -1,5 +1,10 @@
 package kizwid.web;
 
+import kizwid.caterr.dao.ErrorEventDao;
+import kizwid.caterr.dao.PricingRunDao;
+import kizwid.caterr.domain.ErrorEvent;
+import kizwid.caterr.domain.PricingError;
+import kizwid.caterr.domain.PricingRun;
 import kizwid.sqlLoader.SqlLoader;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -27,6 +32,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -38,7 +46,10 @@ import static org.junit.Assert.assertTrue;
  * Date: 2012-02-06
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:sqlLoader/sqlLoader.spring.xml"})
+@ContextConfiguration(locations = {
+        "classpath:sqlLoader/sqlLoader.spring.xml"
+        ,"classpath:caterr/dao.spring.xml"
+})
 public class ErrorControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorControllerTest.class);
@@ -50,8 +61,9 @@ public class ErrorControllerTest {
     private static ErrorControllerTest.WebServer webServer;
     private StringWriter sw;
 
-    @Resource
-    private SqlLoader sqlLoader;
+    @Resource private SqlLoader sqlLoader;
+    @Resource private PricingRunDao pricingRunDao;
+    @Resource private ErrorEventDao errorEventDao;
 
 
     @Before
@@ -86,7 +98,6 @@ public class ErrorControllerTest {
         IDataSet fullDataSet = connection.createDataSet();
         FlatXmlDataSet.write(fullDataSet, new FileOutputStream("target/full-dataset.xml"));
 
-
     }
 
     @Test
@@ -96,7 +107,50 @@ public class ErrorControllerTest {
         get(URL_BASE + "Action=Dashboard&User=unitTest", new PrintWriter(sw));
         String page = sw.toString().trim();
         logger.info(page.substring(0, Math.min(500, page.length())));
-        assertTrue(page.indexOf("<title>Monitor Dashboard</title>") >= 0);
+        assertTrue(page.contains("<title>Monitor Dashboard</title>"));
+        assertTrue(page.contains("Filtered item count: 0"));
+
+/*
+        final WebClient webClient = new WebClient();
+        final HtmlPage page = webClient.getPage(URL_BASE + "Action=Dashboard&User=unitTest");
+        Assert.assertEquals("Monitor Dashboard", page.getTitleText());
+
+        final String pageAsXml = page.asXml();
+        Assert.assertTrue(pageAsXml.contains("Filtered item count: 0"));
+
+        webClient.closeAllWindows();
+*/
+
+    }
+
+    @Test public void canFilterByErrorMessage() throws Exception {
+
+
+        PricingRun pricingRun = new PricingRun(0,"dummy",20130518,"foo",new Date());
+        PricingError pricingError = new PricingError("price","COB","ByEquity","something bad");
+        List<PricingError> pricingErrors = new ArrayList<PricingError>();
+        pricingErrors.add(new PricingError("PRICE","COB","ByEquity","something bad #1"));
+        pricingErrors.add(new PricingError("DELTA","COB","ByCredit","something bad #2"));
+        pricingErrors.add(new PricingError("VEGA","COB","ByCurrency","something bad ~3"));
+        ErrorEvent errorEvent = new ErrorEvent(-1L,"1",new Date(),0L,"rr","rg","b", pricingErrors);
+
+        pricingRunDao.save(pricingRun);
+        errorEventDao.save(errorEvent);
+
+        sw = new StringWriter();
+        get(URL_BASE + "Action=Apply+filter&FilterColumn=error_message&Filter=2&User=unitTest", new PrintWriter(sw));
+        String page = sw.toString().trim();
+        logger.info(page.substring(0, Math.min(500, page.length())));
+        assertTrue(page.contains("Filtered item count: 1"));
+
+/*
+        final WebClient webClient = new WebClient();
+        HtmlPage page = webClient.getPage(URL_BASE + "Action=Apply+filter&FilterColumn=error_message&Filter=2&User=unitTest");
+        Assert.assertTrue(page.asXml().contains("Filtered item count: 1"));
+
+        page = webClient.getPage(URL_BASE + "Action=Apply+filter&FilterColumn=error_message&Filter=bad&User=unitTest");
+        Assert.assertTrue(page.asXml().contains("Filtered item count: 3"));
+*/
 
     }
 
