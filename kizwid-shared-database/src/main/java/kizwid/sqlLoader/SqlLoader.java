@@ -14,10 +14,6 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,44 +50,14 @@ public class SqlLoader {
     }
     }
 
-    private LoadAllScripts createLoader(URL sourceUrl, String path){
+    private ScriptLoader createLoader(URL sourceUrl, String path){
 
         if(path.endsWith("/releases")){
-            return new LoadReleaseScripts(jdbcTemplate, sourceUrl, databaseReleaseDao, path);
+            return new IncrementalScriptLoader(jdbcTemplate, sourceUrl, databaseReleaseDao, path);
         }else {
-            return new LoadViewScripts(jdbcTemplate, sourceUrl, databaseReleaseDao, path);
+            return new RepeatableScriptLoader(jdbcTemplate, sourceUrl, path);
         }
 
-    }
-
-    private static void close(Connection closeable){
-        try {
-            closeable.close();
-        } catch (SQLException e) {
-            //swallow it
-        }
-    }
-    private static void close(Statement closeable){
-        try {
-            closeable.close();
-        } catch (SQLException e) {
-            //swallow it
-        }
-    }
-    private static void close(Closeable closeable){
-        try {
-            closeable.close();
-        } catch (IOException e) {
-            //swallow it
-        }
-
-    }
-    private static void close(ResultSet closeable){
-        try {
-            closeable.close();
-        } catch (SQLException e) {
-            //swallow it
-        }
     }
 
     // we always address the resource via its parent folder, Jetty expects a folder address to have a trailing slash
@@ -116,11 +82,7 @@ public class SqlLoader {
                 "classpath:sqlLoader/sqlLoader.spring.xml"
         };
         ApplicationContext ctx = new ClassPathXmlApplicationContext(locations);
-
-        DatabaseReleaseDao databaseReleaseDao = ctx.getBean("databaseReleaseDao",DatabaseReleaseDao.class);
-        JdbcTemplate jdbcTemplate = ctx.getBean("jdbcTemplate",JdbcTemplate.class);
         SqlLoader sqlLoader = ctx.getBean("sqlLoader",SqlLoader.class);
-
         sqlLoader.load("releases", "views");
 
     }
@@ -130,12 +92,12 @@ public class SqlLoader {
      *  specialised script loader for dealing with release scripts
      * --------------------------------------------------------------------------
      */
-    private static class LoadReleaseScripts extends LoadAllScripts
+    private static class IncrementalScriptLoader extends ScriptLoader
     {
         private final Set releaseFilesAlreadyRun;
         private final DatabaseReleaseDao dao;
 
-        private LoadReleaseScripts(JdbcTemplate jdbcTemplate, URL sourceUrl, DatabaseReleaseDao dao, String path    ) {
+        private IncrementalScriptLoader(JdbcTemplate jdbcTemplate, URL sourceUrl, DatabaseReleaseDao dao, String path) {
             super(jdbcTemplate, sourceUrl, path);
             this.dao = dao;
             releaseFilesAlreadyRun = getReleaseFilesAlreadyRun(dao);
@@ -179,11 +141,11 @@ public class SqlLoader {
      *  specialised script loader for dealing with database objects
      * --------------------------------------------------------------------------
      */
-    private static class LoadViewScripts extends LoadAllScripts
+    private static class RepeatableScriptLoader extends ScriptLoader
     {
         private final JdbcTemplate jdbcTemplate;
 
-        private LoadViewScripts(JdbcTemplate jdbcTemplate, URL sourceUrl, DatabaseReleaseDao dao, String path) {
+        private RepeatableScriptLoader(JdbcTemplate jdbcTemplate, URL sourceUrl, String path) {
             super(jdbcTemplate, sourceUrl, path);
             this.jdbcTemplate = jdbcTemplate;
         }
@@ -191,14 +153,14 @@ public class SqlLoader {
         @Override
         protected void dropObject(String sql){
 
-            //drop view before we re-create it
+            //drop view/function/procedure/trigger/etc before we re-create it
             if( sql.toLowerCase().startsWith("create")){
 
                 String[] rows = sql.split("\n");
                 String[] tokens = rows[0].split(" ");
-                if("view".equals(tokens[1].toLowerCase())){
+                if( !"table".equals(tokens[1].toLowerCase())){
 
-                    final String dropSql = "drop view " + tokens[2];
+                    final String dropSql = "drop " + tokens[1] + " " + tokens[2];
                     logger.info("running: {}", dropSql);
                     try{
                         jdbcTemplate.update(dropSql);
@@ -207,7 +169,6 @@ public class SqlLoader {
                     }
 
                 }
-                //TODO:support stored procedure, trigger etc
             }
 
         }
@@ -220,13 +181,13 @@ public class SqlLoader {
      *  base class for executing scripts on the database
      * --------------------------------------------------------------------------
      */
-    private abstract static class LoadAllScripts
+    private abstract static class ScriptLoader
     {
         private final JdbcTemplate jdbcTemplate;
         private final URL sourceUrl;
         final String path;
 
-        public LoadAllScripts(JdbcTemplate jdbcTemplate, URL sourceUrl, String path)
+        public ScriptLoader(JdbcTemplate jdbcTemplate, URL sourceUrl, String path)
         {
             this.sourceUrl = sourceUrl;
             this.jdbcTemplate = jdbcTemplate;
@@ -282,7 +243,7 @@ public class SqlLoader {
                 String[] dirs = resource.split("/");
                 String name = dirs[dirs.length -1];
                 String sql = SqlLoaderUtil.getSqlFromReader(reader, true);
-                namedSqls.add( new NamedSql(name, sql));
+                namedSqls.add( new NamedSql(name, sql, sourceUrl.toString()));
             }
 
 
@@ -313,12 +274,12 @@ public class SqlLoader {
         {
         }
 
-        public static List splitSqlIntoBatches(String sql)
+        public static List<String> splitSqlIntoBatches(String sql)
         {
-            return splitSqlIntoBatches(sql, ";");
+            return splitSqlIntoBatches(sql, DEFAULT_COMMAND_TERMINATOR, LINE_SEPARATOR);
         }
 
-        public static List splitSqlIntoBatches(String sql, String commandTerminator)
+        public static List<String> splitSqlIntoBatches(String sql, final String commandTerminator, final String lineSeparator)
         {
             List<String> batches = new ArrayList<String>();
             BufferedReader reader = new BufferedReader(new StringReader(sql));
@@ -340,10 +301,10 @@ public class SqlLoader {
                         batchString = batch.toString();
                         if(batchString.trim().length() > 0)
                             batches.add(batchString);
-                        batch = new StringBuilder("");
+                        batch = new StringBuilder();
                     } else
                     {
-                        batch.append(line).append("\n");
+                        batch.append(line).append(lineSeparator);
                     }
 
                 batchString = batch.toString();
@@ -379,7 +340,7 @@ public class SqlLoader {
                 int bang = url.getFile().indexOf('!');
                 URL jar = (bang == -1 ? url: new URL(url.getFile().substring(0,bang)));
                 ZipInputStream zip = new ZipInputStream( jar.openStream());
-                ZipEntry ze = null;
+                ZipEntry ze;
 
                 while( ( ze = zip.getNextEntry() ) != null ) {
                     String entryName = ze.getName();
@@ -405,23 +366,25 @@ public class SqlLoader {
         }
 
         private static List<String> findInFile(File directory, String filenamePattern, String path) {
+            final Pattern pattern = Pattern.compile(filenamePattern);
             List<String> sqlFiles = new ArrayList<String>();
-            File files[] = directory.listFiles();
+            File files[] = directory.listFiles( new FileFilter(){
+                @Override
+                public boolean accept(File file) {
+                    return pattern.matcher(file.getName()).matches();
+                }
+            });
             if(files == null){
                 files = new File[0];
             }
-            int len = files.length;
-            for(int n = 0; n < len; n++)
-            {
-                File file = files[n];
-                if(file.isDirectory())
-                {
+            for (File file : files) {
+                if (file.isDirectory()) {
                     //allow resolve resourceName for nested files
                     sqlFiles.addAll(findInFile(file, filenamePattern, appendTrailingSlash(path) + file.getName()));
                     continue;
                 }
 
-                sqlFiles.add( appendTrailingSlash(path) + file.getName());
+                sqlFiles.add(appendTrailingSlash(path) + file.getName());
             }
 
             return sqlFiles;
@@ -467,7 +430,9 @@ public class SqlLoader {
                 }
 
             }
-            catch(IOException e) { }
+            catch(IOException e) {
+                logger.warn("swallowed exception", e);
+            }
             return sqlOut.toString();
         }
 
@@ -482,10 +447,6 @@ public class SqlLoader {
         private final String name;
         private final String sql;
         private final String source;
-
-        public NamedSql(String name, String sql) {
-            this(name, sql, null);
-        }
 
         public NamedSql(String name, String sql, String source) {
             this.name = name;
