@@ -18,12 +18,13 @@ import java.util.Date;
  * Date: 2012-01-31
  */
 public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<DatabaseRelease, String> implements DatabaseReleaseDao{
+    private static final String RELEASE_TABLE = "database_release";
     private final Logger logger = LoggerFactory.getLogger(DatabaseReleaseDaoImpl.class);
 
     public DatabaseReleaseDaoImpl(DataSource dataSource) {
         super(dataSource,
-                "select * from MONITOR_APP_USER.database_release",
-                "script");
+                "select * from MONITOR_APP_USER." + RELEASE_TABLE,
+                "file_name");
     }
 
     //------------------------------------------------------
@@ -33,18 +34,27 @@ public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<Databas
     public void save(DatabaseRelease databaseRelease) {
         try {
             String sql;
-            sql = "INSERT INTO MONITOR_APP_USER.database_release ( script, deployed_at) " +
-                    "VALUES ( ?, to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF'))";    //to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF') <-> CAST(? AS TIMESTAMP)
-            logger.debug(sql);
+            sql = "INSERT INTO MONITOR_APP_USER." + RELEASE_TABLE + " ( file_name, executed_at, checksum, file_last_modified_at, succeeded) " +
+                    "VALUES ( ?, ?, ?, ?, ?)";    //to_timestamp(?,'YYYY-MM-DD HH24:MI:SS.FF') <-> CAST(? AS TIMESTAMP)
+            logger.info(sql);
+            logger.info(databaseRelease.toString());
             jdbcTemplate.update(dialectFriendlySql(sql), new Object[]{
                     databaseRelease.getId(),
-                    FormatUtil.formatSqlDateTime(databaseRelease.getDeployed_at())
+                    FormatUtil.formatSqlDateTime(databaseRelease.getExecutedAt()),
+                    databaseRelease.getCheckSum(),
+                    databaseRelease.getFileLastModifiedAt(),
+                    databaseRelease.getSucceeded()
             });
 
         } catch (DataAccessException exc) {
             logger.error("SAVE DatabaseRelease FAILED! {} {}",
-                    new Object[]{databaseRelease.getId(),
-                    FormatUtil.formatSqlDateTime(databaseRelease.getDeployed_at())}, exc);
+                    new Object[]{
+                            databaseRelease.getId(),
+                            FormatUtil.formatSqlDateTime(databaseRelease.getExecutedAt()),
+                            databaseRelease.getCheckSum(),
+                            databaseRelease.getFileLastModifiedAt(),
+                            databaseRelease.getSucceeded()
+                    }, exc);
             throw exc;
         }
     }
@@ -61,8 +71,11 @@ public class DatabaseReleaseDaoImpl extends GenericDaoAbstractSpringJdbc<Databas
         public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
             DatabaseRelease e = new DatabaseRelease(
-                    rs.getString("script"),
-                    new Date(rs.getTimestamp("deployed_at").getTime())
+                    rs.getString("file_name"),
+                    new Date(rs.getTimestamp("executed_at").getTime()),
+                    rs.getString("checksum"),
+                    rs.getLong("file_last_modified_at"),
+                    rs.getInt("succeeded")
                     );
             return e;
         }

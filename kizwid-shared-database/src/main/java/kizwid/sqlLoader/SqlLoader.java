@@ -96,21 +96,26 @@ public class SqlLoader {
     {
         private final Set releaseFilesAlreadyRun;
         private final DatabaseReleaseDao dao;
+        private final JdbcTemplate jdbcTemplate;
 
         private IncrementalScriptLoader(JdbcTemplate jdbcTemplate, URL sourceUrl, DatabaseReleaseDao dao, String path) {
             super(jdbcTemplate, sourceUrl, path);
             this.dao = dao;
+            this.jdbcTemplate = jdbcTemplate;
             releaseFilesAlreadyRun = getReleaseFilesAlreadyRun(dao);
         }
 
         public void loadSql(NamedSql namedSql)
                 throws IOException
         {
-            String releaseName = namedSql.getName();
+            String resource = namedSql.getName();
+            String[] dirs = resource.split("/");
+            String releaseName = dirs[dirs.length -1];
+
             if(!releaseFilesAlreadyRun.contains(releaseName))
             {
                 super.loadSql(namedSql);
-                DatabaseRelease release = new DatabaseRelease(releaseName);
+                DatabaseRelease release = new DatabaseRelease(resource);
                 dao.save(release);
             } else
             {
@@ -119,11 +124,26 @@ public class SqlLoader {
         }
 
         protected List<String> getSqlFiles(URL sourceUrl) throws IOException {
-            return SqlLoaderUtil.getAllSqlFiles(sourceUrl, path,"release.*.sql");
+            return SqlLoaderUtil.getAllSqlFiles(sourceUrl, path,"0.*.sql");
         }
 
         private Set<String> getReleaseFilesAlreadyRun(DatabaseReleaseDao dao)
         {
+
+            int n = jdbcTemplate.queryForInt("select count(*) from INFORMATION_SCHEMA.SYSTEM_TABLES where table_name='DATABASE_RELEASE'");
+            if(n==0){
+                jdbcTemplate.update("create table database_release(\n" +
+                        "    file_name varchar(100) primary key\n" +
+                        "    ,executed_at timestamp not null\n" +
+                        "    ,checksum varchar(64)\n" +
+                        "    ,file_last_modified_at bigint\n" +
+                        "    ,succeeded int\n" +
+                        "\n" +
+                        ")");
+                DatabaseRelease databaseRelease = new DatabaseRelease("database_release.sql",new Date());
+                dao.save(databaseRelease);
+            }
+
             List<DatabaseRelease> releases = dao.find(SimpleCriteria.EMPTY_CRITERIA);
             Set<String> releaseFiles = new HashSet<String>();
             for (DatabaseRelease release : releases) {
@@ -240,10 +260,10 @@ public class SqlLoader {
             List<NamedSql> namedSqls = new ArrayList<NamedSql>();
             for (String resource : allSqlFiles) {
                 Reader reader = new InputStreamReader( getInputStream(resource));
-                String[] dirs = resource.split("/");
-                String name = dirs[dirs.length -1];
+                //String[] dirs = resource.split("/");
+                //String name = dirs[dirs.length -1];
                 String sql = SqlLoaderUtil.getSqlFromReader(reader, true);
-                namedSqls.add( new NamedSql(name, sql, sourceUrl.toString()));
+                namedSqls.add( new NamedSql(resource, sql, sourceUrl.toString()));
             }
 
 

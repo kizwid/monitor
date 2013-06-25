@@ -4,8 +4,8 @@ import kizwid.caterr.dao.*;
 import kizwid.caterr.domain.*;
 import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.dao.discriminator.SimpleCriterion;
+import kizwid.shared.util.CalcDigest;
 import kizwid.shared.util.FormatUtil;
-import kizwid.web.util.CalcDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.*;
@@ -309,7 +310,7 @@ public class ErrorController implements Controller {
     }
 
     //save summary + details to view with sorting etc, but allow customisation of criteria applied
-    private Map<String, Object> dashboard(HttpServletRequest request, Map<String, Object> model, List<ErrorSummaryView> errorSummaryViews, List<ErrorDetailView> errorDetailViews) throws NoSuchAlgorithmException {
+    private Map<String, Object> dashboard(HttpServletRequest request, Map<String, Object> model, List<ErrorSummaryView> errorSummaryViews, List<ErrorDetailView> errorDetailViews) throws NoSuchAlgorithmException, IOException {
 
         //current parameters
         model.put(PARAM_BUSINESS_DATE, parseDate(request.getParameter(PARAM_BUSINESS_DATE)));
@@ -364,7 +365,7 @@ public class ErrorController implements Controller {
     }
 
     //default dashboard view: build default criteria from current filter
-    private Map<String, Object> dashboard(HttpServletRequest request, Map<String, Object> model) throws NoSuchAlgorithmException {
+    private Map<String, Object> dashboard(HttpServletRequest request, Map<String, Object> model) throws NoSuchAlgorithmException, IOException {
 
         //current parameters
         int yyyymmdd = parseDate(request.getParameter(PARAM_BUSINESS_DATE));
@@ -487,7 +488,7 @@ public class ErrorController implements Controller {
     
         
     //latest pending error
-    String getLatestHash() throws NoSuchAlgorithmException {
+    String getLatestHash() throws NoSuchAlgorithmException, IOException {
         List<ErrorSummaryView> errorSummaryViews =
                 errorSummaryViewDao.find(
                         createSummaryCriteria(parseDate(null)));
@@ -495,8 +496,8 @@ public class ErrorController implements Controller {
         return getLatestHash(errorSummaryViews);
     }
 
-    private String getLatestHash(List<ErrorSummaryView> errorSummaryViews) throws NoSuchAlgorithmException {
-        return CalcDigest.calcDigest(errorSummaryViews.toString());
+    private String getLatestHash(List<ErrorSummaryView> errorSummaryViews) throws NoSuchAlgorithmException, IOException {
+        return CalcDigest.checksum(errorSummaryViews.toString());
     }
 
     /**
@@ -525,7 +526,8 @@ public class ErrorController implements Controller {
     * ----------------------------------------------------------------------------------------------
      */
     private void saveRandomErrors(int numberToCreate) {
-        final PricingRun pricingRun = new PricingRun(System.currentTimeMillis(), "dummy-run", parseDate(FormatUtil.yyyymmdd(new Date())), "some-config", new Date());
+        long runId = System.currentTimeMillis();
+        final PricingRun pricingRun = new PricingRun(runId, "dummy-run", parseDate(FormatUtil.yyyymmdd(new Date())), "some-config", new Date());
         pricingRunDao.save(pricingRun);
         errorEventDao.saveAll(createRandomErrorEvents(numberToCreate, pricingRun.getId()));
     }

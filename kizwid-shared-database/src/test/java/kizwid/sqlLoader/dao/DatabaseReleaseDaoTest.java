@@ -1,5 +1,6 @@
 package kizwid.sqlLoader.dao;
 
+import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.sqlLoader.AbstractSqlLoaderTest;
 import kizwid.sqlLoader.domain.DatabaseRelease;
 import org.junit.Test;
@@ -7,6 +8,7 @@ import org.springframework.test.annotation.Rollback;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,10 +25,12 @@ public class DatabaseReleaseDaoTest extends AbstractSqlLoaderTest{
     @Test
     @Rollback(true)
     public void canAddRowToDatabaseReleaseTable(){
-        int sizeBefore = jdbcTemplate.queryForInt("select count(*) from database_release");
-        DatabaseRelease databaseRelease = new DatabaseRelease("foo", new Date());
+        List<DatabaseRelease> releases = databaseReleaseDao.find(SimpleCriteria.EMPTY_CRITERIA);
+        int sizeBefore = releases.size();
+        DatabaseRelease databaseRelease = new DatabaseRelease("/foo.sql", new Date());
         databaseReleaseDao.save(databaseRelease);
-        assertTrue(jdbcTemplate.queryForInt("select count(*) from database_release") == sizeBefore + 1);
+        releases = databaseReleaseDao.find(SimpleCriteria.EMPTY_CRITERIA);
+        assertTrue(releases.size() == sizeBefore + 1);
         DatabaseRelease check = databaseReleaseDao.findById(databaseRelease.getId());
         assertEquals(databaseRelease, check);
     }

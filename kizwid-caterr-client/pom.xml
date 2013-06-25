@@ -26,6 +26,14 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>kizwid-shared-database</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Hibernate annotations in entity classes -->
         <dependency>
             <groupId>org.hibernate</groupId>

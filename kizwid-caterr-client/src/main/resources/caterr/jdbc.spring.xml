@@ -10,7 +10,7 @@
 
        default-autowire="byName">
 
-    <import resource="classpath:discovery.spring.xml" />
+    <import resource="classpath:discovery.spring.xml"/>
 
     <bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbc.driver}"/>
