@@ -4,12 +4,15 @@ import kizwid.shared.util.EncryptedPropertyPlaceholderConfigurer;
 import org.dbmaintain.DbMaintainer;
 import org.dbmaintain.MainFactory;
 import org.dbmaintain.structure.clean.DBCleaner;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,7 +32,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:sqlLoader/jdbc.spring.xml"})
+@ContextConfiguration(locations = {"classpath:sqlLoader/sqlLoader.spring.xml"})
 public class AbstractDatabaseTest {
 
     @Resource
@@ -43,6 +46,11 @@ public class AbstractDatabaseTest {
     protected static MainFactory dbMaintainMainFactory;
 
     private static Connection conn = null;
+
+    @Before
+    public void setUp() throws SQLException, IOException, URISyntaxException {
+        initDataBase();
+    }
 
     protected void initDataBase() throws URISyntaxException, IOException, SQLException {
         createDBMainainer().updateDatabase(false);
@@ -100,6 +108,8 @@ public class AbstractDatabaseTest {
     public static void tearDown() throws Exception {
         //capture final state of database
         IDatabaseConnection connection = new DatabaseConnection(conn);
+        DatabaseConfig config = connection.getConfig();
+        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new HsqldbDataTypeFactory());
         // full database export
         IDataSet fullDataSet = connection.createDataSet();
         FlatXmlDataSet.write(fullDataSet, new FileOutputStream("target/full-dataset-dbmaintain.xml"));

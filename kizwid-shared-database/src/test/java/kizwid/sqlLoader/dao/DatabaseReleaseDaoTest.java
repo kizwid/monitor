@@ -1,7 +1,7 @@
 package kizwid.sqlLoader.dao;
 
 import kizwid.shared.dao.discriminator.SimpleCriteria;
-import kizwid.sqlLoader.AbstractSqlLoaderTest;
+import kizwid.shared.database.AbstractDatabaseTest;
 import kizwid.sqlLoader.domain.DatabaseRelease;
 import org.junit.Test;
 import org.springframework.test.annotation.Rollback;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
  * User: kizwid
  * Date: 2012-01-31
  */
-public class DatabaseReleaseDaoTest extends AbstractSqlLoaderTest{
+public class DatabaseReleaseDaoTest extends AbstractDatabaseTest {
 
     @Resource
     DatabaseReleaseDao databaseReleaseDao;
