@@ -40,9 +40,10 @@
 
     <aop:config>
         <aop:pointcut id="daoTransactionOperation"
-                      expression="execution(* kizwid.shared.dao.GenericDaoAbstract.*(..))" />
+                      expression="execution(* kizwid.shared.dao.GenericDao.*(..))" />
         <aop:advisor advice-ref="txAdvice" pointcut-ref="daoTransactionOperation" />
     </aop:config>
 
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
 </beans>

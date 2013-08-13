@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <artifactId>kizwid</artifactId>
     <packaging>pom</packaging>
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <description>Example Monitor Application Project</description>
 
@@ -39,7 +39,9 @@
     </build>
 
     <properties>
-        <version.spring>3.0.5.RELEASE</version.spring>
+        <!--<version.spring>3.0.5.RELEASE</version.spring>-->
+        <version.spring>3.2.0.RELEASE</version.spring>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -72,6 +74,27 @@
         	<version>1.45</version>
         </dependency>
 
+        <!-- tmp-->
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-dependency-analyzer</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-repository-metadata</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-dependency-tree</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.doxia</groupId>
+            <artifactId>doxia-site-renderer</artifactId>
+            <version>1.0-alpha-8</version>
+        </dependency>
 
     </dependencies>
 </project>

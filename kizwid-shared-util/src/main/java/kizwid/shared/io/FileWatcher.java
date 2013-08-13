@@ -8,7 +8,7 @@ import java.io.FileFilter;
 import java.util.*;
 
 /**
- * Scans a directory an notifies observers when it finds files/directories.
+ * Scans a directory and notifies observers when it finds files/directories.
  */
 public class FileWatcher implements Runnable {
 	private static Logger logger = LoggerFactory.getLogger(FileWatcher.class);

@@ -16,9 +16,9 @@
 
         <!--home grown-->
         <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<version>${project.version}</version>-->
-            <!--<artifactId>kizwid-caterr-util</artifactId>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<version>${project.version}</version>-->
+        <!--<artifactId>kizwid-caterr-util</artifactId>-->
         <!--</dependency>-->
 
         <!-- spring -->
@@ -57,14 +57,22 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>3.0.5.RELEASE</version>
+            <version>${version.spring}</version>
         </dependency>
 
+<!--
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-hibernate3</artifactId>
             <version>2.0.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+-->
 
     </dependencies>
 

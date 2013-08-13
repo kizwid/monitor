@@ -5,7 +5,12 @@ import kizwid.shared.database.AbstractDatabaseTest;
 import kizwid.sqlLoader.dao.DatabaseReleaseDao;
 import kizwid.sqlLoader.domain.DatabaseRelease;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -19,6 +24,12 @@ import static org.junit.Assert.assertTrue;
  * User: kizwid
  * Date: 2012-02-01
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {
+        "classpath:sqlLoader/sqlLoader.spring.xml"
+})
+@TransactionConfiguration(defaultRollback=true)
+@Transactional
 public class SqlLoaderTest
         extends AbstractDatabaseTest
 {

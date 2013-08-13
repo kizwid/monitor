@@ -4,7 +4,12 @@ import kizwid.shared.dao.discriminator.SimpleCriteria;
 import kizwid.shared.database.AbstractDatabaseTest;
 import kizwid.sqlLoader.domain.DatabaseRelease;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -17,6 +22,12 @@ import static org.junit.Assert.assertTrue;
  * User: kizwid
  * Date: 2012-01-31
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {
+        "classpath:sqlLoader/sqlLoader.spring.xml"
+})
+@TransactionConfiguration(defaultRollback=true)
+@Transactional
 public class DatabaseReleaseDaoTest extends AbstractDatabaseTest {
 
     @Resource
