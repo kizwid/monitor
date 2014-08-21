@@ -1,0 +1,145 @@
+incoming (forp) pricing request
+---------------------------------
+
+need to
++ strip duplication (identify common features <remove BOOK,RESULTS,GRIMMIS*>)
++ separate pricing context from trade (cob,config,riskGroup,mktdata,dict,split,range,<other?>)
++ associate trade with context (via common dictionary)
+
+naturalKey, md5, sha256, guid are terms all meaning same thing
+
+
+------
+ctx (riskengine dictionary)
+------
+id (4) <-- sequence
+cob(4)
+cfg(2) <-- aka forp instance
+tbk(2)
+rgp(2)
+mkd(2)
+dic(2)
+slt(2)
+rng(2)
++
+forp(2)
+(NB: bizPart, cpart, traderBook should be attached to trade)
+
+RiskEngine 60k dictionaries probably reduces to 10k common dictionaries
+common - 10k * 20
+
+------
+pvd  <-- incoming business event which currently drives all updates(trade,mktdata,config)
+------
+id (8)
+ctx(4)
+blo(5000)
+natural_key(20) <-- not really required
+common_id(8)
+
+----------
+trade (separation of key/instance/envelope?)
+----------
+id (8)  <-- sequence
+source_sys(2) <-- Summit/Bbg/Imagine/FO3DG (vs RMS/Trinity)(tradeCapture vs settlement vs extraction) (source of tradeID)
+trade_id(4)  <-- structureID,tradeID,legID can be complicated
+version(4)  <-- is this sourceSysVer or just sdosInstanceId
+trader_book(4)  <-- GRIMIS_BOOK (overlap with ctx.tbk)
+risk_product(4) <-- DB_RiskProduct
+cparty(4)  <-- DB_CounterParty/DB_RealCounterParty
+model_code(2) <-- from result of model info calc
+dict_item_id(8) <-- get sdos_id via dict_item with option to restore original DB_Name
+pvd_id(8) <-- get common_id via original pvd business event + track if this business event has been processed yet
+
+----------
+trade_surface (current state of all live trades)(possibly responsibility of index not database
+----------
+keyId(8)
+current_instance(8)
+
+
+NB:
+is there value in keeping the trade_key information separate from the trade_instance data
+ie is it expected that each version of the trade will have same meta data
+so for each instance we know the naturalKey
+the tradeKey (source_system, source_system_trade_id) will not change
+but the version will change
+
+NB:
+DB_Name really does mean nothing in terms of SECURITY although riskengine puts primitive trade id into db_name as does dbrat
+it seems score and RMS may not.
+As we want to re-compose trades into pricing units to suit our own heuristics
+this means we need to be able to avoid naming collision and to be able to identify trade from results
+ie in the results object dba seems to use combination of tradeID and DB_Name
+possibly we should inject DB_Name as (sourceSystem + tradeId [+ legId] + version)
+
+business events
++pvd from forp notifies of relationship between trade and mktdata
++trade update (new,amend,drop,tear-up)
++config update(policy, template-version)
++interest rate tick (ccy/basis)
++fx tick (dom/for)
++bond tick (ISIN/calibrate to yield curve)
++exchange tick(stock)
++trader adhoc (re-price on demand)
++reval adhoc (re-price on demand)
+
+------------
+pricer
+------------
+id(8)
+natural_key(20)  <-- do we need to know the natural key of the pricer instance (as we will dynamically create from common_pricer + ?)
+cob(4)
+calc_type(2)
+created(4)
+common_id(8) <-- does not directly link to pvd event
+primary key(id)
+create unique index (natural_key)
+
+
+
+------------
+pricer_dict_item
+------------
+pricer(8)
+dict_item(8)
+parent(8)
+order(2)
+
+------------
+dict_item
+------------
+id(8)
+label(3)
+value(4)
+--version(20)    <-- natural key of sdos
+--OR
+--version(8)     <-- sdos sequence id
+primary key(id)
+create unique index (label,value,version)
+--create unique index (natural_key)
+
+------------
+sdos
+------------
+id(8)
+natural_key(20)
+blob(5MB)
+primary key(id)
+create unique index (natural_key)
+
+
+process external update (pvd)
+---------------------------------------
+- add incoming pvd to next sequence
+- identify common_id
+- add pricer_dict_item components
+- add new unique dict_items and sdos to respective tables
+- strip trades into trade table and associate ctx/trade_envelope meta data
+- update trade_surface
+
+process internal price event (schedule/capacity available/bulk)
+----------------------------------------------------------------
+- add to next internal event sequence (record last_pvd_event) aka calculation_event/run
+- collect common_id and associated trades(between 2 txn ids)
+- generate new pricer instances (based on

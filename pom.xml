@@ -22,6 +22,7 @@
         <module>kizwid-caterr-client</module>
         <module>kizwid-shared-domain</module>
         <module>kizwid-riskstore-server</module>
+        <module>datastore</module>
     </modules>
 
     <build>

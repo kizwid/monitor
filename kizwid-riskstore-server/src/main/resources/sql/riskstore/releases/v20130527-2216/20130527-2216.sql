@@ -1,8 +1,8 @@
 create table DEAL (
     deal_id bigint not null,
+    guid varchar(32),
     name varchar(255),
-    creation_time date,
-    creation_user bigint,
+    creation_time timestamp,
     primary key (deal_id)
 ):
 create table REGION (
