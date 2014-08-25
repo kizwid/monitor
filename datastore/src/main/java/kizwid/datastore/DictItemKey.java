@@ -12,7 +12,7 @@ public class DictItemKey implements Serializable{
     public DictItemKey(DictItem dictItem){
         this(dictItem.getLabel(), dictItem.getValue());
     }
-    private DictItemKey(String label, String value) {
+    public DictItemKey(String label, String value) {
         this.label = label;
         this.value = value;
     }

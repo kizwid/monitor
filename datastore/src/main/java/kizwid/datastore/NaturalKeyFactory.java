@@ -10,6 +10,8 @@ import static kizwid.datastore.Const.*;
  */
 public class NaturalKeyFactory {
 
+    public final static byte[] UNKNOWN_NATURAL_KEY = new byte[0];
+
     public static byte[] create(Set<DictItem> dictItems) {
         StringBuilder sb = new StringBuilder();
         for (DictItem dictItem : dictItems) {

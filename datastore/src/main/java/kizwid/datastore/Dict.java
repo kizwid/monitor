@@ -26,9 +26,11 @@ public class Dict implements DictItem{
         this.id = id;
         this.dictItems = new LinkedHashSet<DictItem>(dictItems);
         this.naturalKey = NaturalKeyFactory.create(dictItems);
-        if(!Arrays.equals(naturalKey,this.naturalKey)){
-            throw new IllegalStateException("Calculated naturalKey not matched given(" + Hex.encodeHexString(naturalKey) + ") calculated(" + Hex.encodeHexString(this.naturalKey) + ")");
-        }
+        if (!Arrays.equals(naturalKey, NaturalKeyFactory.UNKNOWN_NATURAL_KEY))
+            //only compare calculated with expected when expected is already known
+            if (!Arrays.equals(naturalKey, this.naturalKey)) {
+                throw new IllegalStateException("Calculated naturalKey not matched given(" + Hex.encodeHexString(naturalKey) + ") calculated(" + Hex.encodeHexString(this.naturalKey) + ")");
+            }
     }
 
     public long getId() {
