@@ -1,5 +1,6 @@
 package kizwid.datastore;
 
+import kizwid.datastore.biz.Trade;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 
@@ -13,14 +14,22 @@ public class CompositeDictTest {
 
     @Test public void canRecomposeInCorrectOrder(){
 
-        Set<DictItem> trades = new LinkedHashSet<DictItem>();
-        trades.add(new RegularDictItem("SECURITY", "trade-1", "cde", DictItemType.Sdos, Collections.<DictItem>emptySet()));
-        trades.add(new RegularDictItem("SECURITY", "trade-2", "cdf", DictItemType.Sdos, Collections.<DictItem>emptySet()));
-        trades.add(new RegularDictItem("SECURITY", "trade-3", "cdg", DictItemType.Sdos, Collections.<DictItem>emptySet()));
+        Set<Trade> trades = new LinkedHashSet<Trade>();
+        trades.add(TradeFixture.createRandomTrade());
+        trades.add(TradeFixture.createRandomTrade());
+        trades.add(TradeFixture.createRandomTrade());
+
+        Set<DictItem> tradeItems = new LinkedHashSet<DictItem>(trades.size());
+        for (Trade trade : trades) {
+            tradeItems.add(new RegularDictItem("SECURITY", trade.getName(), Hex.encodeHexString(trade.getNaturalKey()), DictItemType.Sdos, Collections.<DictItem>emptySet()));
+        }
+        //tradeItems.add(new RegularDictItem("SECURITY", "trade-1", "cde", DictItemType.Sdos, Collections.<DictItem>emptySet()));
+        //tradeItems.add(new RegularDictItem("SECURITY", "trade-2", "cdf", DictItemType.Sdos, Collections.<DictItem>emptySet()));
+        //tradeItems.add(new RegularDictItem("SECURITY", "trade-3", "cdg", DictItemType.Sdos, Collections.<DictItem>emptySet()));
 
         DictItem book = new RegularDictItem.DictItemBuilder()
-                .withChildren(trades)
-                .withVersion(Hex.encodeHexString(NaturalKeyFactory.create(trades)))
+                .withChildren(tradeItems)
+                .withVersion(Hex.encodeHexString(NaturalKeyFactory.create(tradeItems)))
                 .withDictItemType(DictItemType.Collection)
                 .withId(10L)
                 .withLabel("BOOK")
@@ -54,6 +63,7 @@ public class CompositeDictTest {
         CompositeDict compositeDict = new CompositeDict(baseDict, overrides, dictItemOrder);
         System.out.println(compositeDict.toSdos());
         System.out.println(compositeDict.toString());
+        System.out.println(book.getChildren());
 
     }
 

@@ -1,5 +1,6 @@
 package kizwid.datastore.biz;
 
+import kizwid.datastore.NaturalKeyFactory;
 import kizwid.util.FormatUtil;
 
 import java.util.Date;
@@ -16,6 +17,8 @@ public class Trade {
     private final float notional;
     private final float rate;
     private final TradeType tradeType;
+    private final transient String name;
+    private final transient byte[] naturalKey;
 
     public Trade(Date settleDate, Date maturityDate, float notional, float rate, TradeType tradeType) {
         this.settleDate = settleDate;
@@ -23,6 +26,8 @@ public class Trade {
         this.notional = notional;
         this.rate = rate;
         this.tradeType = tradeType;
+        this.name = resolveName();
+        this.naturalKey = NaturalKeyFactory.create(toSdos());
     }
 
     public Date getSettleDate() {
@@ -43,6 +48,14 @@ public class Trade {
 
     public TradeType getTradeType() {
         return tradeType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public byte[] getNaturalKey() {
+        return naturalKey;
     }
 
     @Override
@@ -89,7 +102,12 @@ public class Trade {
                 .append("Notional").append(TAB).append(notional).append(LF)
                 .append("Rate").append(TAB).append(rate).append(LF)
                 .append("TradeType").append(TAB).append(SPEECHMARK).append(tradeType.name()).append(SPEECHMARK).append(LF)
+                //.append("DB_Name").append(TAB).append(SPEECHMARK).append(resolveName()).append(SPEECHMARK).append(LF)
                 ;
         return sb.toString();
+    }
+
+    private String resolveName(){
+        return new String("T-" + tradeType.name() + "." + FormatUtil.yyyymmdd(maturityDate) + notional + "/" + rate);
     }
 }
