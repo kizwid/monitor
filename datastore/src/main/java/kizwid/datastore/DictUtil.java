@@ -14,6 +14,11 @@ public class DictUtil {
         //and overrides (most likely not shared)
         //whilst maintaining the original order
 
+        if(dict instanceof CompositeDict){
+            //no need to split it twice
+            return (CompositeDict)dict;
+        }
+
         Set<DictItem> baseDict = new LinkedHashSet<DictItem>();
         Set<DictItem> overrides = new LinkedHashSet<DictItem>();
         DictItemKey[] dictItemOrder = new DictItemKey[dict.getDictItems().size()];

@@ -1,40 +1,19 @@
 package kizwid.datastore;
 
-import kizwid.datastore.biz.Trade;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class CompositeDictTest {
 
     @Test public void canRecomposeInCorrectOrder(){
 
-        Set<Trade> trades = new LinkedHashSet<Trade>();
-        trades.add(TradeFixture.createRandomTrade());
-        trades.add(TradeFixture.createRandomTrade());
-        trades.add(TradeFixture.createRandomTrade());
-
-        Set<DictItem> tradeItems = new LinkedHashSet<DictItem>(trades.size());
-        for (Trade trade : trades) {
-            tradeItems.add(new RegularDictItem("SECURITY", trade.getName(), Hex.encodeHexString(trade.getNaturalKey()), DictItemType.Sdos, Collections.<DictItem>emptySet()));
-        }
-        //tradeItems.add(new RegularDictItem("SECURITY", "trade-1", "cde", DictItemType.Sdos, Collections.<DictItem>emptySet()));
-        //tradeItems.add(new RegularDictItem("SECURITY", "trade-2", "cdf", DictItemType.Sdos, Collections.<DictItem>emptySet()));
-        //tradeItems.add(new RegularDictItem("SECURITY", "trade-3", "cdg", DictItemType.Sdos, Collections.<DictItem>emptySet()));
-
-        DictItem book = new RegularDictItem.DictItemBuilder()
-                .withChildren(tradeItems)
-                .withVersion(Hex.encodeHexString(NaturalKeyFactory.create(tradeItems)))
-                .withDictItemType(DictItemType.Collection)
-                .withId(10L)
-                .withLabel("BOOK")
-                .withValue("some-book")
-                .build();
+        DictItem book = DictFixture.createBook();
 
         Set<DictItem> baseDict = new LinkedHashSet<DictItem>();
         baseDict.add(
@@ -61,9 +40,13 @@ public class CompositeDictTest {
         dictItemOrder[4] = new DictItemKey("BOOK", "some-book");
 
         CompositeDict compositeDict = new CompositeDict(baseDict, overrides, dictItemOrder);
-        System.out.println(compositeDict.toSdos());
-        System.out.println(compositeDict.toString());
-        System.out.println(book.getChildren());
+
+        assertEquals(baseDict, compositeDict.getBaseDict());
+        assertEquals(overrides, compositeDict.getOverrides());
+        assertArrayEquals(dictItemOrder, compositeDict.getDictItemOrder());
+
+        Dict check = new Dict(compositeDict.getDictItems());
+        assertEquals(compositeDict.getDictItems(), check.getDictItems());
 
     }
 

@@ -3,6 +3,7 @@ package kizwid.datastore.biz;
 import kizwid.datastore.NaturalKeyFactory;
 import kizwid.util.FormatUtil;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import static kizwid.datastore.Const.*;
@@ -12,15 +13,15 @@ import static kizwid.datastore.Const.*;
  */
 public class Trade {
 
-    private final Date settleDate;
-    private final Date maturityDate;
+    private final int settleDate;
+    private final int maturityDate;
     private final float notional;
     private final float rate;
     private final TradeType tradeType;
     private final transient String name;
     private final transient byte[] naturalKey;
 
-    public Trade(Date settleDate, Date maturityDate, float notional, float rate, TradeType tradeType) {
+    public Trade(int settleDate, int maturityDate, float notional, float rate, TradeType tradeType) {
         this.settleDate = settleDate;
         this.maturityDate = maturityDate;
         this.notional = notional;
@@ -30,11 +31,11 @@ public class Trade {
         this.naturalKey = NaturalKeyFactory.create(toSdos());
     }
 
-    public Date getSettleDate() {
+    public int getSettleDate() {
         return settleDate;
     }
 
-    public Date getMaturityDate() {
+    public int getMaturityDate() {
         return maturityDate;
     }
 
@@ -65,23 +66,14 @@ public class Trade {
 
         Trade trade = (Trade) o;
 
-        if (Float.compare(trade.notional, notional) != 0) return false;
-        if (Float.compare(trade.rate, rate) != 0) return false;
-        if (maturityDate != null ? !maturityDate.equals(trade.maturityDate) : trade.maturityDate != null) return false;
-        if (settleDate != null ? !settleDate.equals(trade.settleDate) : trade.settleDate != null) return false;
-        if (tradeType != trade.tradeType) return false;
+        if (!Arrays.equals(naturalKey, trade.naturalKey)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = settleDate != null ? settleDate.hashCode() : 0;
-        result = 31 * result + (maturityDate != null ? maturityDate.hashCode() : 0);
-        result = 31 * result + (notional != +0.0f ? Float.floatToIntBits(notional) : 0);
-        result = 31 * result + (rate != +0.0f ? Float.floatToIntBits(rate) : 0);
-        result = 31 * result + (tradeType != null ? tradeType.hashCode() : 0);
-        return result;
+        return naturalKey != null ? Arrays.hashCode(naturalKey) : 0;
     }
 
     @Override
@@ -97,8 +89,8 @@ public class Trade {
 
     public String toSdos(){
         StringBuilder sb = new StringBuilder("NEWDEAL\n")
-                .append("SettlementDate").append(TAB).append(FormatUtil.yyyymmdd(settleDate)).append(LF)
-                .append("MaturityDate").append(TAB).append(FormatUtil.yyyymmdd(maturityDate)).append(LF)
+                .append("SettlementDate").append(TAB).append(settleDate).append(LF)
+                .append("MaturityDate").append(TAB).append(maturityDate).append(LF)
                 .append("Notional").append(TAB).append(notional).append(LF)
                 .append("Rate").append(TAB).append(rate).append(LF)
                 .append("TradeType").append(TAB).append(SPEECHMARK).append(tradeType.name()).append(SPEECHMARK).append(LF)
@@ -108,6 +100,6 @@ public class Trade {
     }
 
     private String resolveName(){
-        return new String("T-" + tradeType.name() + "." + FormatUtil.yyyymmdd(maturityDate) + notional + "/" + rate);
+        return new String("T-" + tradeType.name() + "." + maturityDate + "." + notional + "/" + rate);
     }
 }

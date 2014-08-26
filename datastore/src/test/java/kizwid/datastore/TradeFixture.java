@@ -14,30 +14,24 @@ import java.util.Random;
 public class TradeFixture {
 
     public static Trade createRandomTrade(){
-
         Random random = new Random();
-        Date settle = randomPastDate();
-        Date maturity = randomFutureDate();
+        int settle = randomPastDate();
+        int maturity = randomFutureDate();
         float notional = random.nextFloat();
         float rate = random.nextFloat();
-        TradeType tradeType = TradeType.values()[random.nextInt((int)7)];
+        TradeType tradeType = TradeType.values()[random.nextInt(7)];
         return new Trade(settle, maturity, notional, rate, tradeType);
     }
 
-    private static Date randomFutureDate() {
-        try {
-            return FormatUtil.yyyymmddToDate("20150122");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    private static int randomFutureDate() {
+        return 20150122;
     }
 
-    private static Date randomPastDate() {
-        try {
-            return FormatUtil.yyyymmddToDate("20140122");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    private static int randomPastDate() {
+        return 20140122;
     }
 
+    public static Trade createTrade(int settle, int maturity, float notional, float rate, TradeType tradeType) {
+        return new Trade(settle, maturity, notional, rate, tradeType);
+    }
 }

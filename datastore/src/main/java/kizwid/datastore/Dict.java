@@ -3,10 +3,7 @@ package kizwid.datastore;
 import kizwid.shared.Builder;
 import org.apache.commons.codec.binary.Hex;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static kizwid.datastore.Const.*;
 
@@ -140,18 +137,43 @@ public class Dict implements DictItem{
         private final Dict template;
 
         public DictBuilder() {
-            this.template = new Dict(EMPTY.dictItems);
+            this(new Dict(EMPTY.dictItems));
+        }
+        public DictBuilder(Dict prototype) {
+            this.template = new Dict(prototype.getDictItems());
+
         }
 
         public DictBuilder withId(long p){template.id = p;return this;}
         public DictBuilder withDictItems(Set<DictItem> p){template.dictItems = new LinkedHashSet<DictItem>(p);return this;}
         public DictBuilder withDictItem(DictItem p){template.dictItems.add(p);return this;}
 
+        /**
+         * replace the dictItem identified by its key
+         *
+         * @param dictItemKey
+         * @param dictItem
+         * @return
+         */
+        public DictBuilder replaceDictItem(DictItemKey dictItemKey, DictItem dictItem) {
+            Map<DictItemKey, DictItem> data = new LinkedHashMap<DictItemKey, DictItem>();
+            for (DictItem item : template.getDictItems()) {
+                data.put(new DictItemKey(item), item);
+            }
+            if(!data.containsKey(dictItemKey)){
+                throw new IllegalArgumentException("DictItemKey " + dictItemKey + " not found in Dict " + data);
+            }
+            data.put(dictItemKey, dictItem);
+            template.dictItems = new LinkedHashSet<DictItem>(data.values());
+            return this;
+        }
+
         @Override
         public Dict build() {
             template.naturalKey = NaturalKeyFactory.create(template.dictItems);
             return template;
         }
+
     }
 
 }
