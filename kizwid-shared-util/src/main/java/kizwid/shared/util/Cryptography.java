@@ -8,6 +8,7 @@ import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
@@ -38,6 +39,20 @@ public class Cryptography {
     }
 
     public Cryptography(String password, String cipherSpec) throws UnsupportedEncodingException {
+
+        //hack to avoid max enstription length restriction
+        //better to install the unrestricted policy
+        //http://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
+        //http://opensourceforgeeks.blogspot.in/2014/09/how-to-install-java-cryptography.html#sthash.wy6yAtkI.dpuf
+        try {
+            Field field = Class.forName("javax.crypto.JceSecurity").
+                    getDeclaredField("isRestricted");
+            field.setAccessible(true);
+            field.set(null, java.lang.Boolean.FALSE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
         secureRandom = new SecureRandom();
         this.password = password;
